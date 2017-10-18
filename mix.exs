@@ -4,7 +4,7 @@ defmodule ExAws.SQS.Mixfile do
   def project do
     [
       app: :ex_aws_sqs,
-      version: "0.1.0",
+      version: "2.0.0",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env == :prod,
