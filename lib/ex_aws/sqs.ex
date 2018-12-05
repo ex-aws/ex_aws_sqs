@@ -277,7 +277,7 @@ defmodule ExAws.SQS do
     action_string = action |> Atom.to_string |> Macro.camelize
 
     %ExAws.Operation.Query{
-      path: "/" <> queue,
+      path: "/queue/#{queue}",
       params: params |> Map.put("Action", action_string),
       service: :sqs,
       action: action,
