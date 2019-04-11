@@ -1,10 +1,28 @@
 defmodule ExAws.SQS.Mixfile do
   use Mix.Project
 
+  @version "2.0.1"
+  @url_docs "https://hexdocs.pm/ex_aws_sqs"
+  @url_github "https://github.com/ex-aws/ex_aws_sqs"
+
   def project do
     [
       app: :ex_aws_sqs,
-      version: "2.0.0",
+      name: "ExAws.SQS",
+      description: "ExAws.SQS service package",
+      package: %{
+        files: [
+          "lib",
+          "mix.exs",
+        ],
+        licenses: [ "MIT" ],
+        links: %{
+          "Docs" => @url_docs,
+          "GitHib" => @url_github
+        },
+        maintainers: ["Ben Wilson"]
+      }, 
+      version: @version,
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env == :prod,
@@ -25,6 +43,7 @@ defmodule ExAws.SQS.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ex_doc, ">= 0.0.0", only: :dev},
       {:hackney, ">= 0.0.0", only: [:dev, :test]},
       {:sweet_xml, ">= 0.0.0", only: [:dev, :test]},
       {:poison, ">= 0.0.0", only: [:dev, :test]},
