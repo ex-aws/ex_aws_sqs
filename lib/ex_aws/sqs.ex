@@ -110,7 +110,7 @@ defmodule ExAws.SQS do
       |> build_attrs
       |> Map.put("QueueName", queue)
 
-    request("", :create_queue, params)
+    request(nil, :create_queue, params)
   end
 
   @doc "Delete a message from a SQS Queue"
@@ -156,11 +156,12 @@ defmodule ExAws.SQS do
   @doc "Get queue URL"
   @spec get_queue_url(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec get_queue_url(queue_name :: binary, opts :: [queue_owner_aws_account_id: binary]) :: ExAws.Operation.Query.t
-  def get_queue_url(queue_name, opts \\ []) do
+  def get_queue_url(queue, opts \\ []) do
     params = opts
       |> format_regular_opts
-      |> Map.put("QueueName", queue_name)
-    request("", :get_queue_url, params)
+      |> Map.put("QueueName", queue)
+
+    request(nil, :get_queue_url, params)
   end
 
   @doc "Retrieves the dead letter source queues for a given SQS Queue"
@@ -176,7 +177,7 @@ defmodule ExAws.SQS do
     params = opts
     |> format_regular_opts
 
-    request("", :list_queues, params)
+    request(nil, :list_queues, params)
   end
 
   @doc "Purge all messages in a SQS Queue"
@@ -194,8 +195,8 @@ defmodule ExAws.SQS do
   ]
 
   @doc "Read messages from a SQS Queue"
-  @spec receive_message(queue_name :: binary) :: ExAws.Operation.Query.t
-  @spec receive_message(queue_name :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
+  @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t
+  @spec receive_message(queue_url :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
   def receive_message(queue, opts \\ []) do
     {attrs, opts} = opts
     |> Keyword.pop(:attribute_names, [])
@@ -225,8 +226,8 @@ defmodule ExAws.SQS do
   ]
 
   @doc "Send a message to a SQS Queue"
-  @spec send_message(queue_name :: binary, message_body :: binary) :: ExAws.Operation.Query.t
-  @spec send_message(queue_name :: binary, message_body :: binary, opts :: sqs_message_opts) :: ExAws.Operation.Query.t
+  @spec send_message(queue_url :: binary, message_body :: binary) :: ExAws.Operation.Query.t
+  @spec send_message(queue_url :: binary, message_body :: binary, opts :: sqs_message_opts) :: ExAws.Operation.Query.t
   def send_message(queue, message, opts \\ []) do
     {attrs, opts} = opts
     |> Keyword.pop(:message_attributes, [])
@@ -251,7 +252,7 @@ defmodule ExAws.SQS do
     ]
 
   @doc "Send up to 10 messages to a SQS Queue in a single request"
-  @spec send_message_batch(queue_name :: binary, messages :: [sqs_batch_message, ...]) :: ExAws.Operation.Query.t
+  @spec send_message_batch(queue_url :: binary, messages :: [sqs_batch_message, ...]) :: ExAws.Operation.Query.t
   def send_message_batch(queue, messages) do
     params =
       messages
@@ -264,7 +265,7 @@ defmodule ExAws.SQS do
   end
 
   @doc "Set attributes of a SQS Queue"
-  @spec set_queue_attributes(queue_name :: binary, attributes :: queue_attributes) :: ExAws.Operation.Query.t
+  @spec set_queue_attributes(queue_url :: binary, attributes :: queue_attributes) :: ExAws.Operation.Query.t
   def set_queue_attributes(queue, attributes \\ []) do
     params =
       attributes
@@ -273,11 +274,19 @@ defmodule ExAws.SQS do
     request(queue, :set_queue_attributes, params)
   end
 
+  defp request(nil, action, params) do
+    generate_query(action, params)
+  end
+
   defp request(queue, action, params) do
-    action_string = action |> Atom.to_string |> Macro.camelize
+    query_params = params |> Map.put("QueueUrl", queue)
+    generate_query(action, query_params)
+  end
+
+  defp generate_query(action, params) do
+    action_string = action |> Atom.to_string() |> Macro.camelize()
 
     %ExAws.Operation.Query{
-      path: "/" <> queue,
       params: params |> Map.put("Action", action_string),
       service: :sqs,
       action: action,
