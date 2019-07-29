@@ -18,7 +18,7 @@ defmodule ExAws.SQS.Mixfile do
         licenses: [ "MIT" ],
         links: %{
           "Docs" => @url_docs,
-          "GitHib" => @url_github
+          "GitHub" => @url_github
         },
         maintainers: ["Ben Wilson"]
       }, 
