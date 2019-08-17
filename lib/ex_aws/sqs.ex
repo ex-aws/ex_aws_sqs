@@ -63,13 +63,13 @@ defmodule ExAws.SQS do
   for a specific action for a specific account.
   """
   @spec add_permission(queue_url :: binary, label :: binary, permissions :: sqs_acl) :: ExAws.Operation.Query.t
-  def add_permission(queue, label, permissions \\ %{}) do
+  def add_permission(queue_url, label, permissions \\ %{}) do
     params =
       permissions
       |> format_permissions
       |> Map.put("Label", label)
 
-    request(queue, :add_permission, params)
+    request(queue_url, :add_permission, params)
   end
 
   @doc """
@@ -77,8 +77,8 @@ defmodule ExAws.SQS do
   the specified queue to the specified value
   """
   @spec change_message_visibility(queue_url :: binary, receipt_handle :: binary, visibility_timeout :: visibility_timeout) :: ExAws.Operation.Query.t
-  def change_message_visibility(queue, receipt_handle, visibility_timeout) do
-    request(queue, :change_message_visibility, %{"ReceiptHandle" => receipt_handle, "VisibilityTimeout" => visibility_timeout})
+  def change_message_visibility(queue_url, receipt_handle, visibility_timeout) do
+    request(queue_url, :change_message_visibility, %{"ReceiptHandle" => receipt_handle, "VisibilityTimeout" => visibility_timeout})
   end
 
   @doc """
@@ -90,7 +90,7 @@ defmodule ExAws.SQS do
     :visibility_timeout => visibility_timeout
   }
   @spec change_message_visibility_batch(queue_url :: binary, opts :: [message_visibility_batch_item, ...]) :: ExAws.Operation.Query.t
-  def change_message_visibility_batch(queue, messages) do
+  def change_message_visibility_batch(queue_url, messages) do
     params =
       messages
       |> Enum.with_index
@@ -98,25 +98,25 @@ defmodule ExAws.SQS do
         Map.merge(params, format_batch_visibility_change(message, index))
       end)
 
-    request(queue, :change_message_visibility_batch, params)
+    request(queue_url, :change_message_visibility_batch, params)
   end
 
   @doc "Create queue"
   @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec create_queue(queue_name :: binary, queue_attributes :: queue_attributes) :: ExAws.Operation.Query.t
-  def create_queue(queue, attributes \\ []) do
+  def create_queue(queue_name, attributes \\ []) do
     params =
       attributes
       |> build_attrs
-      |> Map.put("QueueName", queue)
+      |> Map.put("QueueName", queue_name)
 
     request(nil, :create_queue, params)
   end
 
   @doc "Delete a message from a SQS Queue"
   @spec delete_message(queue_url :: binary, receipt_handle :: binary) :: ExAws.Operation.Query.t
-  def delete_message(queue, receipt_handle) do
-    request(queue, :delete_message, %{"ReceiptHandle" => receipt_handle})
+  def delete_message(queue_url, receipt_handle) do
+    request(queue_url, :delete_message, %{"ReceiptHandle" => receipt_handle})
   end
 
   @doc "Deletes a list of messages from a SQS Queue in a single request"
@@ -125,7 +125,7 @@ defmodule ExAws.SQS do
     :receipt_handle => binary
   }
   @spec delete_message_batch(queue_url :: binary, message_receipts :: [delete_message_batch_item, ...]) :: ExAws.Operation.Query.t
-  def delete_message_batch(queue, messages) do
+  def delete_message_batch(queue_url, messages) do
     params =
       messages
       |> Enum.with_index
@@ -133,41 +133,41 @@ defmodule ExAws.SQS do
         Map.merge(params, format_batch_deletion(message, index))
       end)
 
-    request(queue, :delete_message_batch, params)
+    request(queue_url, :delete_message_batch, params)
   end
 
   @doc "Delete a queue"
   @spec delete_queue(queue_url :: binary) :: ExAws.Operation.Query.t
-  def delete_queue(queue) do
-    request(queue, :delete_queue, %{})
+  def delete_queue(queue_url) do
+    request(queue_url, :delete_queue, %{})
   end
 
   @doc "Gets attributes of a SQS Queue"
   @spec get_queue_attributes(queue_url :: binary) :: ExAws.Operation.Query.t
   @spec get_queue_attributes(queue_url :: binary, attribute_names :: :all | [sqs_queue_attribute_name, ...]) :: ExAws.Operation.Query.t
-  def get_queue_attributes(queue, attributes \\ :all) do
+  def get_queue_attributes(queue_url, attributes \\ :all) do
     params =
     attributes
     |> format_queue_attributes
 
-    request(queue, :get_queue_attributes, params)
+    request(queue_url, :get_queue_attributes, params)
   end
 
   @doc "Get queue URL"
   @spec get_queue_url(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec get_queue_url(queue_name :: binary, opts :: [queue_owner_aws_account_id: binary]) :: ExAws.Operation.Query.t
-  def get_queue_url(queue, opts \\ []) do
+  def get_queue_url(queue_name, opts \\ []) do
     params = opts
       |> format_regular_opts
-      |> Map.put("QueueName", queue)
+      |> Map.put("QueueName", queue_name)
 
     request(nil, :get_queue_url, params)
   end
 
   @doc "Retrieves the dead letter source queues for a given SQS Queue"
   @spec list_dead_letter_source_queues(queue_url :: binary) :: ExAws.Operation.Query.t
-  def list_dead_letter_source_queues(queue) do
-    request(queue, :list_dead_letter_source_queues, %{})
+  def list_dead_letter_source_queues(queue_url) do
+    request(queue_url, :list_dead_letter_source_queues, %{})
   end
 
   @doc "Retrieves a list of all the SQS Queues"
@@ -182,8 +182,8 @@ defmodule ExAws.SQS do
 
   @doc "Purge all messages in a SQS Queue"
   @spec purge_queue(queue_url :: binary) :: ExAws.Operation.Query.t
-  def purge_queue(queue) do
-    request(queue, :purge_queue, %{})
+  def purge_queue(queue_url) do
+    request(queue_url, :purge_queue, %{})
   end
 
   @type receive_message_opts :: [
@@ -197,7 +197,7 @@ defmodule ExAws.SQS do
   @doc "Read messages from a SQS Queue"
   @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t
   @spec receive_message(queue_url :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
-  def receive_message(queue, opts \\ []) do
+  def receive_message(queue_url, opts \\ []) do
     {attrs, opts} = opts
     |> Keyword.pop(:attribute_names, [])
 
@@ -209,13 +209,13 @@ defmodule ExAws.SQS do
     |> Map.merge(format_message_attributes(message_attrs))
     |> Map.merge(format_regular_opts(opts))
 
-    request(queue, :receive_message, params)
+    request(queue_url, :receive_message, params)
   end
 
   @doc "Removes permission with the given label from the Queue"
-  @spec remove_permission(queue_name :: binary, label :: binary) :: ExAws.Operation.Query.t
-  def remove_permission(queue, label) do
-    request(queue, :remove_permission, %{"Label" => label})
+  @spec remove_permission(queue_url :: binary, label :: binary) :: ExAws.Operation.Query.t
+  def remove_permission(queue_url, label) do
+    request(queue_url, :remove_permission, %{"Label" => label})
   end
 
   @type sqs_message_opts :: [
@@ -228,7 +228,7 @@ defmodule ExAws.SQS do
   @doc "Send a message to a SQS Queue"
   @spec send_message(queue_url :: binary, message_body :: binary) :: ExAws.Operation.Query.t
   @spec send_message(queue_url :: binary, message_body :: binary, opts :: sqs_message_opts) :: ExAws.Operation.Query.t
-  def send_message(queue, message, opts \\ []) do
+  def send_message(queue_url, message, opts \\ []) do
     {attrs, opts} = opts
     |> Keyword.pop(:message_attributes, [])
 
@@ -239,7 +239,7 @@ defmodule ExAws.SQS do
     |> Map.merge(attrs)
     |> Map.put("MessageBody", message)
 
-    request(queue, :send_message, params)
+    request(queue_url, :send_message, params)
   end
 
   @type sqs_batch_message :: binary | [
@@ -253,7 +253,7 @@ defmodule ExAws.SQS do
 
   @doc "Send up to 10 messages to a SQS Queue in a single request"
   @spec send_message_batch(queue_url :: binary, messages :: [sqs_batch_message, ...]) :: ExAws.Operation.Query.t
-  def send_message_batch(queue, messages) do
+  def send_message_batch(queue_url, messages) do
     params =
       messages
       |> Enum.with_index
@@ -261,25 +261,25 @@ defmodule ExAws.SQS do
         Map.merge(params, format_batch_message(message, index))
       end)
 
-    request(queue, :send_message_batch, params)
+    request(queue_url, :send_message_batch, params)
   end
 
   @doc "Set attributes of a SQS Queue"
   @spec set_queue_attributes(queue_url :: binary, attributes :: queue_attributes) :: ExAws.Operation.Query.t
-  def set_queue_attributes(queue, attributes \\ []) do
+  def set_queue_attributes(queue_url, attributes \\ []) do
     params =
       attributes
       |> build_attrs
 
-    request(queue, :set_queue_attributes, params)
+    request(queue_url, :set_queue_attributes, params)
   end
 
   defp request(nil, action, params) do
     generate_query(action, params)
   end
 
-  defp request(queue, action, params) do
-    query_params = params |> Map.put("QueueUrl", queue)
+  defp request(queue_url, action, params) do
+    query_params = params |> Map.put("QueueUrl", queue_url)
     generate_query(action, query_params)
   end
 

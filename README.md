@@ -1,4 +1,6 @@
 # ExAws.SQS
+[![Hex version](https://img.shields.io/hexpm/v/ex_aws_sqs.svg "Hex
+version")](https://hex.pm/packages/ex_aws_sqs)
 
 Service module for https://github.com/ex-aws/ex_aws
 
