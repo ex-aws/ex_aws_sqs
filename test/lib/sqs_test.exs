@@ -8,7 +8,7 @@ defmodule ExAws.SQSTest do
   end
 
   test "#delete_queue" do
-    expected = %{"Action" => "DeleteQueue"}
+    expected = %{"Action" => "DeleteQueue", "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.delete_queue("982071696186/test_queue").params
   end
 
@@ -25,25 +25,25 @@ defmodule ExAws.SQSTest do
   end
 
   test "#get_queue_attributes" do
-    expected = %{"Action" => "GetQueueAttributes", "AttributeName.1" => "All"}
+    expected = %{"Action" => "GetQueueAttributes", "QueueUrl" => "982071696186/test_queue", "AttributeName.1" => "All"}
     assert expected == SQS.get_queue_attributes("982071696186/test_queue").params
 
-    expected =  %{"Action" => "GetQueueAttributes", "AttributeName.1" => "VisibilityTimeout", "AttributeName.2" => "MessageRetentionPeriod"}
+    expected =  %{"Action" => "GetQueueAttributes", "QueueUrl" => "982071696186/test_queue", "AttributeName.1" => "VisibilityTimeout", "AttributeName.2" => "MessageRetentionPeriod"}
     assert expected == SQS.get_queue_attributes("982071696186/test_queue", [:visibility_timeout, :message_retention_period]).params
   end
 
   test "#set_queue_attributes" do
-    expected = %{"Action" => "SetQueueAttributes", "Attribute.1.Name" => "VisibilityTimeout", "Attribute.1.Value" => 10}
+    expected = %{"Action" => "SetQueueAttributes", "QueueUrl" => "982071696186/test_queue", "Attribute.1.Name" => "VisibilityTimeout", "Attribute.1.Value" => 10}
     assert expected == SQS.set_queue_attributes("982071696186/test_queue", visibility_timeout: 10).params
   end
 
   test "#purge_queue" do
-    expected = %{"Action" => "PurgeQueue"}
+    expected = %{"Action" => "PurgeQueue", "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.purge_queue("982071696186/test_queue").params
   end
 
   test "#list_dead_letter_source_queues" do
-    expected = %{"Action" => "ListDeadLetterSourceQueues"}
+    expected = %{"Action" => "ListDeadLetterSourceQueues", "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.list_dead_letter_source_queues("982071696186/test_queue").params
   end
 
@@ -56,27 +56,29 @@ defmodule ExAws.SQSTest do
       "AWSAccountId.2" => "071669896281",
       "ActionName.2" => "SendMessage",
       "AWSAccountId.3" => "071669896281",
-      "ActionName.3" => "ReceiveMessage"
+      "ActionName.3" => "ReceiveMessage",
+      "QueueUrl" => "982071696186/test_queue"
     }
 
     assert expected == SQS.add_permission("982071696186/test_queue", "TestAddPermission", %{"681962096817" => :all, "071669896281" => [:send_message, :receive_message]}).params
   end
 
   test "#remove_permission" do
-    expected = %{"Action" => "RemovePermission", "Label" => "TestAddPermission"}
+    expected = %{"Action" => "RemovePermission", "Label" => "TestAddPermission", "QueueUrl" => "982071696186/test_queue"}
 
     assert expected == SQS.remove_permission("982071696186/test_queue", "TestAddPermission").params
   end
 
   test "#send_message" do
     expected = %{"Action" => "SendMessage",
+                 "QueueUrl" => "982071696186/test_queue",
                  "MessageBody" => "This is the message body.",
                  "DelaySeconds" => 30,
                  "MessageAttribute.1.Name" => "TestStringAttribute",
                  "MessageAttribute.1.Value.StringValue" => "testing!",
                  "MessageAttribute.1.Value.DataType" => "String",
                  "MessageAttribute.2.Name" => "TestBinaryAttribute",
-                 "MessageAttribute.2.Value.BinaryValue" => <<31, 139, 8, 0, 0, 0, 0, 0, 0, 19, 43, 73, 45, 46, 201, 204, 75, 87, 4, 0, 188, 169, 224, 119, 8, 0, 0, 0>>,
+                 "MessageAttribute.2.Value.BinaryValue" => :zlib.gzip("testing!"),
                  "MessageAttribute.2.Value.DataType" => "Binary",
                  "MessageAttribute.3.Name" => "TestNumberAttribute",
                  "MessageAttribute.3.Value.StringValue" => 42,
@@ -119,6 +121,7 @@ defmodule ExAws.SQSTest do
 
   test "#send_message for FIFO queue" do
     expected = %{"Action" => "SendMessage",
+                 "QueueUrl" => "982071696186/test_queue",
                  "MessageBody" => "This is the message body.",
                  "DelaySeconds" => 30,
                  "MessageAttribute.1.Name" => "TestStringAttribute",
@@ -147,6 +150,7 @@ defmodule ExAws.SQSTest do
 
   test "#send_message_batch" do
     expected = %{"Action" => "SendMessageBatch",
+                 "QueueUrl" => "982071696186/test_queue",
                  "SendMessageBatchRequestEntry.1.Id" => "test_message_1",
                  "SendMessageBatchRequestEntry.1.MessageBody" => "This is the message body.",
                  "SendMessageBatchRequestEntry.1.DelaySeconds" => 30,
@@ -154,7 +158,7 @@ defmodule ExAws.SQSTest do
                  "SendMessageBatchRequestEntry.1.MessageAttribute.1.Value.StringValue" => "testing!",
                  "SendMessageBatchRequestEntry.1.MessageAttribute.1.Value.DataType" => "String",
                  "SendMessageBatchRequestEntry.1.MessageAttribute.2.Name" => "TestBinaryAttribute",
-                 "SendMessageBatchRequestEntry.1.MessageAttribute.2.Value.BinaryValue" => <<31, 139, 8, 0, 0, 0, 0, 0, 0, 19, 43, 73, 45, 46, 201, 204, 75, 87, 4, 0, 188, 169, 224, 119, 8, 0, 0, 0>>,
+                 "SendMessageBatchRequestEntry.1.MessageAttribute.2.Value.BinaryValue" => :zlib.gzip("testing!"),
                  "SendMessageBatchRequestEntry.1.MessageAttribute.2.Value.DataType" => "Binary",
                  "SendMessageBatchRequestEntry.1.MessageAttribute.3.Name" => "TestNumberAttribute",
                  "SendMessageBatchRequestEntry.1.MessageAttribute.3.Value.StringValue" => 42,
@@ -217,6 +221,7 @@ defmodule ExAws.SQSTest do
 
   test "#send_message_batch for FIFO queue" do
     expected = %{"Action" => "SendMessageBatch",
+                 "QueueUrl" => "982071696186/test_queue.fifo",
                  "SendMessageBatchRequestEntry.1.Id" => "test_message_1",
                  "SendMessageBatchRequestEntry.1.MessageBody" => "This is the message body.",
                  "SendMessageBatchRequestEntry.1.DelaySeconds" => 30,
@@ -269,21 +274,21 @@ defmodule ExAws.SQSTest do
   end
 
   test "#receive_message" do
-    expected = %{"Action" => "ReceiveMessage"}
+    expected = %{"Action" => "ReceiveMessage", "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.receive_message("982071696186/test_queue").params
 
-    expected = %{"Action" => "ReceiveMessage", "AttributeName.1" => "All", "MaxNumberOfMessages" => 5}
+    expected = %{"Action" => "ReceiveMessage", "AttributeName.1" => "All", "MaxNumberOfMessages" => 5, "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.receive_message("982071696186/test_queue", attribute_names: :all,
                                                                       max_number_of_messages: 5).params
 
-    expected = %{"Action" => "ReceiveMessage", "AttributeName.1" => "SenderId", "AttributeName.2" => "ApproximateReceiveCount", "VisibilityTimeout" => 1000, "WaitTimeSeconds" => 20}
+    expected = %{"Action" => "ReceiveMessage", "AttributeName.1" => "SenderId", "AttributeName.2" => "ApproximateReceiveCount", "VisibilityTimeout" => 1000, "WaitTimeSeconds" => 20, "QueueUrl" => "982071696186/test_queue"}
     assert expected == SQS.receive_message("982071696186/test_queue", attribute_names: [:sender_id, :approximate_receive_count],
                                                                       visibility_timeout: 1000,
                                                                       wait_time_seconds: 20).params
   end
 
   test "#receive_message can set the message attributes to all" do
-    expected = %{"Action" => "ReceiveMessage", "MessageAttributeNames" => "All"}
+    expected = %{"Action" => "ReceiveMessage", "QueueUrl" => "12345/test_queue", "MessageAttributeNames" => "All"}
 
     actual = SQS.receive_message("12345/test_queue", message_attribute_names: :all)
     assert expected == actual.params
@@ -291,6 +296,7 @@ defmodule ExAws.SQSTest do
 
   test "#receive_message can specify message attributes" do
     expected = %{"Action" => "ReceiveMessage",
+                 "QueueUrl" => "12345/test_queue",
                  "MessageAttributeName.1" => "FooAttr",
                  "MessageAttributeName.2" => "BarAttr",
                  "MessageAttributeName.3" => "BazAttr"}
@@ -302,6 +308,7 @@ defmodule ExAws.SQSTest do
 
   test "#receive_message can specify wildcard attributes" do
     expected = %{"Action" => "ReceiveMessage",
+                 "QueueUrl" => "12345/test_queue",
                  "MessageAttributeName.1" => "Foo.*"}
     actual = SQS.receive_message("12345/test_queue",
                                  message_attribute_names: ["Foo.*"])
@@ -310,6 +317,7 @@ defmodule ExAws.SQSTest do
 
   test "receive_message can set atom message attributes" do
     expected = %{"Action" => "ReceiveMessage",
+                 "QueueUrl" => "12345/test_queue",
                  "MessageAttributeName.1" => "FooAttr",
                  "MessageAttributeName.2" => "BarAttr",
                  "MessageAttributeName.3" => "BazAttr"}
@@ -320,12 +328,13 @@ defmodule ExAws.SQSTest do
   end
 
   test "#delete_message" do
-    expected = %{"Action" => "DeleteMessage", "ReceiptHandle" => "AQEB0aw+z96sMOUWLQuIzA7nPHS7zUOIRlV0OEqvDoKtNcHxSVDQEfY0gBOJKGcnyTvIUncpimPv0CfQDFbwmdU9E00793cP19Bx8BqzuS0sNrARyY4M4xVi7ceVYHMSNU1uyF/+sK6u8yAGnsbsgmPg4AUs5oapv5Qawiq5HJGgH3cmRPy5/IW+b9W6HVy//uNzejbIcAjQX58Dd79D4AGb9Iu4dqfEVK7zo5BCTy+pz9hqGf5MT3jkrd5umjwGdrg3sVBYhrLjmgaqftON8JclkmrUJk0LzPwQ4DdpT8oz5mh7VzAjRXkIA0IQ8PGFFGPMIb8gWNzJ4KA4/OYlnDYyGw=="}
+    expected = %{"Action" => "DeleteMessage", "QueueUrl" => "982071696186/test_queue", "ReceiptHandle" => "AQEB0aw+z96sMOUWLQuIzA7nPHS7zUOIRlV0OEqvDoKtNcHxSVDQEfY0gBOJKGcnyTvIUncpimPv0CfQDFbwmdU9E00793cP19Bx8BqzuS0sNrARyY4M4xVi7ceVYHMSNU1uyF/+sK6u8yAGnsbsgmPg4AUs5oapv5Qawiq5HJGgH3cmRPy5/IW+b9W6HVy//uNzejbIcAjQX58Dd79D4AGb9Iu4dqfEVK7zo5BCTy+pz9hqGf5MT3jkrd5umjwGdrg3sVBYhrLjmgaqftON8JclkmrUJk0LzPwQ4DdpT8oz5mh7VzAjRXkIA0IQ8PGFFGPMIb8gWNzJ4KA4/OYlnDYyGw=="}
     assert expected == SQS.delete_message("982071696186/test_queue", "AQEB0aw+z96sMOUWLQuIzA7nPHS7zUOIRlV0OEqvDoKtNcHxSVDQEfY0gBOJKGcnyTvIUncpimPv0CfQDFbwmdU9E00793cP19Bx8BqzuS0sNrARyY4M4xVi7ceVYHMSNU1uyF/+sK6u8yAGnsbsgmPg4AUs5oapv5Qawiq5HJGgH3cmRPy5/IW+b9W6HVy//uNzejbIcAjQX58Dd79D4AGb9Iu4dqfEVK7zo5BCTy+pz9hqGf5MT3jkrd5umjwGdrg3sVBYhrLjmgaqftON8JclkmrUJk0LzPwQ4DdpT8oz5mh7VzAjRXkIA0IQ8PGFFGPMIb8gWNzJ4KA4/OYlnDYyGw==").params
   end
 
   test "#delete_message_batch" do
     expected = %{"Action" => "DeleteMessageBatch",
+                 "QueueUrl" => "982071696186/test_queue",
                  "DeleteMessageBatchRequestEntry.1.Id" => "message_1",
                  "DeleteMessageBatchRequestEntry.1.ReceiptHandle" => "AQEBlA6/i+8F3P6lA7y3msc8dINnF+b3VgTX71nMWw7VvbHc8mdGFyZjVAVMH/rg6Vyc00O2Tl2ZyKn8IPUiy6n44ipop+xb33XNU/cABvVWZogNN95b9mmR6RuSA0dcVmFL02TwZDpg7cMOWNhYThEp+a5atsG85PX7V6q9zBklltBSQnT6r9QSngnv2m1C23jfFYow0oy86cofp0mQ4z5ez9bWmlHa4XfpZUpP2KVlBCDgyR0tQQRGt170foph32Cg+Bp6RRv9Tyo7aVWqM4OT/CHTJ0ZPiAYoH8MYFxjUaqoeKhUwDFq36trQxrBq9BfBj+hrzEtDQdxcNZM2pZi2xQ==",
                  "DeleteMessageBatchRequestEntry.2.Id" => "message_2",
@@ -345,6 +354,7 @@ defmodule ExAws.SQSTest do
 
   test "#change_message_visibility" do
     expected = %{"Action" => "ChangeMessageVisibility",
+                 "QueueUrl" => "982071696186/test_queue",
                  "ReceiptHandle" => "AQEBS52UqQL7wJo1I21OqVBXTbxZa0WrHqKntw/N4YtYblV3mix7BkEQVM16K9WABAM9q6AKqjiuTPQAmhqRz2+pw02QuNB5kUn2hpSLVTasAkcTMPgFfLFEufBxGR2hxGeOvP/XDO3DPGnQO3WvOSJTxQKitwT9xWDWAZgm96Ra1pnduckZkLTWolj+34okJqQTDVAL7/Br4BEtgHQXJKm5BCfry8jA1XYjy5IjyB2syLihdgVU0qBLxlGDDhuCOW5eNQiVig3v0oa7SVvRKzMK4bMor1Y17wSETo6y0gYb1QtD1rBUpoKAeq49gpKjBnAkMdHV/DFAfRAtcJNcsPpiQA==",
                  "VisibilityTimeout" => 300}
 
@@ -355,6 +365,7 @@ defmodule ExAws.SQSTest do
 
   test "#change_message_visibility_batch" do
     expected = %{"Action" => "ChangeMessageVisibilityBatch",
+                 "QueueUrl" => "982071696186/test_queue",
                  "ChangeMessageVisibilityBatchRequestEntry.1.Id" => "message_1",
                  "ChangeMessageVisibilityBatchRequestEntry.1.ReceiptHandle" => "AQEBnLhpyRJrHQrnrj9KdMD2PjD5XJdb26X12vvOvZuqoa/i1LGSq4JO7HHmoXGbrn04Zi4jTb4yQGywI/Q1yah/kPgLQuiOAHlnPvypRmKeToeJoHA75bduoC0o8rCokcQtTy9ZGIBM/WlnrND4Cs0Zie7KJEEq4LxDb9xivphZp1vjXTwActAwCN6jk4rSlyXaLTgYoeeugjm4RoM0Vq+iSQX/vksNAkEy2pjZWg3/K8v8/2JQZtop6F6JjcaRlhRYSKvwSu0Xjh3U3QJhXaWZL0u9e08k16g8pE5Q/5s50Gjo9qTkDFUdJVBmFdiyccH1afkkwgYQ4/TJ9j/wR2jQRA==",
                  "ChangeMessageVisibilityBatchRequestEntry.1.VisibilityTimeout" => 300,
@@ -376,7 +387,7 @@ defmodule ExAws.SQSTest do
       }
     ])
 
-    assert result.path == "/982071696186/test_queue"
+    assert result.path == "/"
     assert result.params == expected
   end
 end
