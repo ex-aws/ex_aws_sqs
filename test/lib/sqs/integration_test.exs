@@ -163,6 +163,8 @@ defmodule ExAws.SQSIntegrationTest do
     assert queue_url |> String.contains?(@queue_name)
   end
 
+  # This is skipped because elasticmq does not support this action which is used for testing, this 
+  # Does work against AWS SQS directly
   @tag :skip
   test "list_dead_letter_source_queues/1", context do
     assert {:ok, _} = SQS.list_dead_letter_source_queues(context.queue_url) |> ExAws.request()
@@ -206,6 +208,8 @@ defmodule ExAws.SQSIntegrationTest do
     assert is_list(messages)
   end
 
+  # This is skipped because elasticmq does not support this action which is used for testing, this 
+  # Does work against AWS SQS directly
   @tag :skip
   test "remove_permission/2", context do
     SQS.add_permission(@queue_name, "TestAddPermission") |> ExAws.request()
