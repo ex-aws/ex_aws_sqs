@@ -18,3 +18,6 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
+
+# Elixir Language Server files (e.g. for VSCode users).
+/.elixir_ls

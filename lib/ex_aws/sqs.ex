@@ -10,13 +10,22 @@ defmodule ExAws.SQS do
     :change_message_visibility |
     :get_queue_attributes
   @type sqs_acl :: %{ binary => :all | [sqs_permission, ...]}
+
+  # Values taken from
+  # https://github.com/aws/aws-sdk-go/blob/075b1d697ba8dbab8bb841042fa12d43192d0153/models/apis/sqs/2012-11-05/api-2.json#L752.
+  # They differ from the list of allowed values described in the aws-cli (`aws sqs receive-message help`) or on
+  # https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html, but they match the
+  # ones described in prose under the respective section.
   @type sqs_message_attribute_name ::
     :sender_id |
     :sent_timestamp |
     :approximate_receive_count |
     :approximate_first_receive_timestamp |
-    :wait_time_seconds |
-    :receive_message_wait_time_seconds
+    :sequence_number |
+    :message_deduplication_id |
+    :message_group_id |
+    :aws_trace_header
+
   @type sqs_queue_attribute_name ::
     :policy
     | :visibility_timeout
@@ -329,6 +338,7 @@ defmodule ExAws.SQS do
   end
 
   defp format_param_key("*"), do: "*"
+  defp format_param_key(:aws_trace_header), do: "AWSTraceHeader" # Key doesn't follow generic camelizing rule below.
   defp format_param_key(key) do
     key
     |> Atom.to_string
