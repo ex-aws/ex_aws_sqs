@@ -1,3 +1,6 @@
+v3.0.1
+- Updated `sqs_message_attribute_name` typespec for `SQS.receive_message` to match AWS support attributes.
+
 v3.0.0
 - ***BREAKING CHANGE***: Changed queue specific functions to take the QueueUrl instead of the QueueName. Previously the name was used to build the path for the request. This is an anti-pattern according to aws docs and prevents this library from being used with alternative SQS compatible services, like localstack.
 
