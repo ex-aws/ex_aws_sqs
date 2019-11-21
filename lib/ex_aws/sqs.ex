@@ -59,6 +59,8 @@ defmodule ExAws.SQS do
     | {:redrive_policy, binary}
     | {:fifo_queue, boolean}
     | {:content_based_deduplication, boolean}
+    | {:kms_master_key_id, binary}
+    | {:kms_data_key_reuse_period_seconds, 60..86400}
   ]
   @type sqs_message_attribute :: %{
     :name => binary,
@@ -70,6 +72,8 @@ defmodule ExAws.SQS do
   @doc """
   Adds a permission with the provided label to the Queue
   for a specific action for a specific account.
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_AddPermission.html)
   """
   @spec add_permission(queue_url :: binary, label :: binary, permissions :: sqs_acl) :: ExAws.Operation.Query.t
   def add_permission(queue_url, label, permissions \\ %{}) do
@@ -84,6 +88,8 @@ defmodule ExAws.SQS do
   @doc """
   Extends the read lock timeout for the specified message from
   the specified queue to the specified value
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibility.html)
   """
   @spec change_message_visibility(queue_url :: binary, receipt_handle :: binary, visibility_timeout :: visibility_timeout) :: ExAws.Operation.Query.t
   def change_message_visibility(queue_url, receipt_handle, visibility_timeout) do
@@ -92,6 +98,8 @@ defmodule ExAws.SQS do
 
   @doc """
   Extends the read lock timeout for a batch of 1..10 messages
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibilityBatch.html)
   """
   @type message_visibility_batch_item :: %{
     :id => binary,
@@ -110,7 +118,44 @@ defmodule ExAws.SQS do
     request(queue_url, :change_message_visibility_batch, params)
   end
 
-  @doc "Create queue"
+  @doc """
+  Create queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html)
+
+  ## Attributes
+
+    * `:delay_seconds` - The length of time, in seconds, for which the delivery of all messages in the queue is delayed. Valid values: An integer from 0 to 900 seconds (15 minutes). Default: 0. 
+    
+    * `:maximum_message_size` - The limit of how many bytes a message can contain before Amazon SQS rejects it. Valid values: An integer from 1,024 bytes (1 KiB) to 262,144 bytes (256 KiB). Default: 262,144 (256 KiB). 
+
+    * `:message_retention_period` - The length of time, in seconds, for which Amazon SQS retains a message. Valid values: An integer from 60 seconds (1 minute) to 1,209,600 seconds (14 days). Default: 345,600 (4 days).
+    
+    * `:policy` - The queue's policy. A valid AWS policy. For more information about policy structure, see [Overview of AWS IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/PoliciesOverview.html) in the Amazon IAM User Guide. 
+
+    * `:receive_message_wait_time_seconds` - The length of time, in seconds, for which a [ReceiveMessage](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) action waits for a message to arrive. Valid values: An integer from 0 to 20 (seconds). Default: 0.
+
+    * `:redrive_policy` - The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object. For more information about the redrive policy and dead-letter queues, see [Using Amazon SQS Dead-Letter Queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html) in the Amazon Simple Queue Service Developer Guide. 
+      * `deadLetterTargetArn` – The Amazon Resource Name (ARN) of the dead-letter queue to which Amazon SQS moves messages after the value of maxReceiveCount is exceeded.
+
+      * `maxReceiveCount` – The number of times a message is delivered to the source queue before being moved to the dead-letter queue. When the ReceiveCount for a message exceeds the maxReceiveCount for a queue, Amazon SQS moves the message to the dead-letter-queue.
+
+      *Note*
+      
+      The dead-letter queue of a FIFO queue must also be a FIFO queue. Similarly, the dead-letter queue of a standard queue must also be a standard queue.
+
+    * `:visibility_timeout` - The visibility timeout for the queue, in seconds. Valid values: An integer from 0 to 43,200 (12 hours). Default: 30. For more information about the visibility timeout, see [Visibility Timeout](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html) in the Amazon Simple Queue Service Developer Guide. 
+    
+    * `:fifo_queue` - Designates a queue as FIFO. Valid values: true, false. If you don't specify the FifoQueue attribute, Amazon SQS creates a standard queue. You can provide this attribute only during queue creation. You can't change it for an existing queue. When you set this attribute, you must also provide the MessageGroupId for your messages explicitly.
+      For more information, see [FIFO Queue Logic](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-understanding-logic) in the Amazon Simple Queue Service Developer Guide.
+    
+    * `:content_based_deduplication` - Enables content-based deduplication. Valid values: true, false. For more information, see [Exactly-Once Processing](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-exactly-once-processing) in the Amazon Simple Queue Service Developer Guide. 
+
+    * `:kms_master_key_id` - The ID of an AWS-managed customer master key (CMK) for Amazon SQS or a custom CMK. For more information, see [Key Terms](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-sse-key-terms). While the alias of the AWS-managed CMK for Amazon SQS is always alias/aws/sqs, the alias of a custom CMK can, for example, be alias/MyAlias . For more examples, see [KeyId](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html#API_DescribeKey_RequestParameters) in the AWS Key Management Service API Reference. 
+
+    * `:kms_data_key_reuse_period_seconds` - The length of time, in seconds, for which Amazon SQS can reuse a [data key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) to encrypt or decrypt messages before calling AWS KMS again. An integer representing seconds, between 60 seconds (1 minute) and 86,400 seconds (24 hours). Default: 300 (5 minutes). A shorter time period provides better security but results in more calls to KMS which might incur charges after Free Tier. For more information, see [How Does the Data Key Reuse Period Work?](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work). 
+
+  """
   @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec create_queue(queue_name :: binary, queue_attributes :: queue_attributes) :: ExAws.Operation.Query.t
   def create_queue(queue_name, attributes \\ []) do
@@ -122,13 +167,21 @@ defmodule ExAws.SQS do
     request(nil, :create_queue, params)
   end
 
-  @doc "Delete a message from a SQS Queue"
+  @doc """
+  Delete a message from a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessage.html)
+  """
   @spec delete_message(queue_url :: binary, receipt_handle :: binary) :: ExAws.Operation.Query.t
   def delete_message(queue_url, receipt_handle) do
     request(queue_url, :delete_message, %{"ReceiptHandle" => receipt_handle})
   end
 
-  @doc "Deletes a list of messages from a SQS Queue in a single request"
+  @doc """
+  Deletes a list of messages from a SQS Queue in a single request
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessageBatch.html)
+  """
   @type delete_message_batch_item :: %{
     :id => binary,
     :receipt_handle => binary
@@ -145,13 +198,21 @@ defmodule ExAws.SQS do
     request(queue_url, :delete_message_batch, params)
   end
 
-  @doc "Delete a queue"
+  @doc """
+  Delete a queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteQueue.html)
+  """
   @spec delete_queue(queue_url :: binary) :: ExAws.Operation.Query.t
   def delete_queue(queue_url) do
     request(queue_url, :delete_queue, %{})
   end
 
-  @doc "Gets attributes of a SQS Queue"
+  @doc """
+  Gets attributes of a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html)
+  """
   @spec get_queue_attributes(queue_url :: binary) :: ExAws.Operation.Query.t
   @spec get_queue_attributes(queue_url :: binary, attribute_names :: :all | [sqs_queue_attribute_name, ...]) :: ExAws.Operation.Query.t
   def get_queue_attributes(queue_url, attributes \\ :all) do
@@ -162,7 +223,15 @@ defmodule ExAws.SQS do
     request(queue_url, :get_queue_attributes, params)
   end
 
-  @doc "Get queue URL"
+  @doc """
+  Get queue URL
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueUrl.html)
+
+  ## Options
+
+    * `:queue_owner_aws_account_id` -  The AWS account ID of the account that created the queue.
+  """
   @spec get_queue_url(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec get_queue_url(queue_name :: binary, opts :: [queue_owner_aws_account_id: binary]) :: ExAws.Operation.Query.t
   def get_queue_url(queue_name, opts \\ []) do
@@ -173,13 +242,26 @@ defmodule ExAws.SQS do
     request(nil, :get_queue_url, params)
   end
 
-  @doc "Retrieves the dead letter source queues for a given SQS Queue"
+  @doc """
+  Retrieves the dead letter source queues for a given SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListDeadLetterSourceQueues.html)
+  """
   @spec list_dead_letter_source_queues(queue_url :: binary) :: ExAws.Operation.Query.t
   def list_dead_letter_source_queues(queue_url) do
     request(queue_url, :list_dead_letter_source_queues, %{})
   end
 
-  @doc "Retrieves a list of all the SQS Queues"
+  @doc """
+  Retrieves a list of all the SQS Queues
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListQueues.html)
+
+  ## Options
+
+    * `:queue_name_prefix` - A string to use for filtering the list results. Only those queues whose name begins with the specified string are returned.
+      Queue URLs and names are case-sensitive.
+  """
   @spec list_queues() :: ExAws.Operation.Query.t
   @spec list_queues(opts :: [queue_name_prefix: binary]) :: ExAws.Operation.Query.t
   def list_queues(opts \\ []) do
@@ -189,7 +271,11 @@ defmodule ExAws.SQS do
     request(nil, :list_queues, params)
   end
 
-  @doc "Purge all messages in a SQS Queue"
+  @doc """
+  Purge all messages in a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_PurgeQueue.html)
+  """
   @spec purge_queue(queue_url :: binary) :: ExAws.Operation.Query.t
   def purge_queue(queue_url) do
     request(queue_url, :purge_queue, %{})
@@ -200,10 +286,44 @@ defmodule ExAws.SQS do
     {:message_attribute_names, :all | [String.Chars.t, ...]} |
     {:max_number_of_messages, 1..10} |
     {:visibility_timeout, 0..43200} |
-    {:wait_time_seconds, 0..20}
+    {:wait_time_seconds, 0..20} |
+    {:receive_request_attempt_id, String.t}
   ]
 
-  @doc "Read messages from a SQS Queue"
+  @doc """
+  Read messages from a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
+  
+  ## Options
+
+    * `:attribute_names` - `:all` or a list of `AttributeNames` to include in the response. Valid attributes are:
+    [:sender_id, :sent_timestamp, :approximate_receive_count, :approximate_first_receive_timestamp, :sequence_number, :message_deduplication_id, :message_group_id, :aws_trace_header] 
+
+    * `:message_attribute_names` - List of message attributes to include.    
+
+      * The name can contain alphanumeric characters and the underscore (_), hyphen (-), and period (.).
+
+      * The name is case-sensitive and must be unique among all attribute names for the message.
+
+      * The name must not start with AWS-reserved prefixes such as AWS. or Amazon. (or any casing variants).
+
+      * The name must not start or end with a period (.), and it should not have periods in succession (..).
+
+      * The name can be up to 256 characters long.
+
+      When using ReceiveMessage, you can send a list of attribute names to receive, or you can return all of the attributes by specifying All or .* in your request. You can also use all message attributes starting with a prefix, for example bar.*. 
+
+    * `:max_number_of_messages` - The maximum number of messages to return. Amazon SQS never returns more messages than this value (however, fewer messages might be returned). Valid values: 1 to 10. Default: 1. 
+
+    * `:visibility_timeout` - The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request. 
+
+    * `:wait_time_seconds` - The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner than WaitTimeSeconds. If no messages are available and the wait time expires, the call returns successfully with an empty list of messages.
+
+    * `:receive_request_attempt_id` - This parameter applies only to FIFO (first-in-first-out) queues.
+
+      The token used for deduplication of ReceiveMessage calls. If a networking issue occurs after a ReceiveMessage action, and instead of a response you receive a generic error, it is possible to retry the same action with an identical ReceiveRequestAttemptId to retrieve the same set of messages, even if their visibility timeout has not yet expired. 
+  """
   @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t
   @spec receive_message(queue_url :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
   def receive_message(queue_url, opts \\ []) do
@@ -221,7 +341,11 @@ defmodule ExAws.SQS do
     request(queue_url, :receive_message, params)
   end
 
-  @doc "Removes permission with the given label from the Queue"
+  @doc """
+  Removes permission with the given label from the Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_RemovePermission.html)
+  """
   @spec remove_permission(queue_url :: binary, label :: binary) :: ExAws.Operation.Query.t
   def remove_permission(queue_url, label) do
     request(queue_url, :remove_permission, %{"Label" => label})
@@ -234,7 +358,21 @@ defmodule ExAws.SQS do
     {:message_group_id, binary}
   ]
 
-  @doc "Send a message to a SQS Queue"
+  @doc """
+  Send a message to a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html)
+
+  ## Options
+
+    * `:delay_seconds` - The length of time, in seconds, for which to delay a specific message. Valid values: 0 to 900. Maximum: 15 minutes. Messages with a positive DelaySeconds value become available for processing after the delay period is finished. If you don't specify a value, the default value for the queue applies. 
+
+    * `:message_attributes` - Each message attribute consists of a Name, Type, and Value. For more information, see [Amazon SQS Message Attributes](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-attributes.html) in the Amazon Simple Queue Service Developer Guide.
+
+    * `:message_deduplication_id` - This parameter applies only to FIFO (first-in-first-out) queues.
+
+    * `:message_group_id` - This parameter applies only to FIFO (first-in-first-out) queues.
+  """
   @spec send_message(queue_url :: binary, message_body :: binary) :: ExAws.Operation.Query.t
   @spec send_message(queue_url :: binary, message_body :: binary, opts :: sqs_message_opts) :: ExAws.Operation.Query.t
   def send_message(queue_url, message, opts \\ []) do
@@ -260,7 +398,11 @@ defmodule ExAws.SQS do
       {:message_group_id, binary}
     ]
 
-  @doc "Send up to 10 messages to a SQS Queue in a single request"
+  @doc """
+  Send up to 10 messages to a SQS Queue in a single request
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessageBatch.html)
+  """
   @spec send_message_batch(queue_url :: binary, messages :: [sqs_batch_message, ...]) :: ExAws.Operation.Query.t
   def send_message_batch(queue_url, messages) do
     params =
@@ -273,7 +415,11 @@ defmodule ExAws.SQS do
     request(queue_url, :send_message_batch, params)
   end
 
-  @doc "Set attributes of a SQS Queue"
+  @doc """
+  Set attributes of a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html)
+  """
   @spec set_queue_attributes(queue_url :: binary, attributes :: queue_attributes) :: ExAws.Operation.Query.t
   def set_queue_attributes(queue_url, attributes \\ []) do
     params =
