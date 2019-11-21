@@ -1,3 +1,6 @@
+v3.0.2
+- Improved docs 
+
 v3.0.1
 - Updated `sqs_message_attribute_name` typespec for `SQS.receive_message` to match AWS support attributes.
 
