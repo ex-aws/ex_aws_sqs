@@ -1,6 +1,7 @@
 defmodule ExAws.SQSIntegrationTest do
   use ExUnit.Case, async: true
   alias ExAws.SQS
+  @moduletag :external
 
   @queue_name "test_queue"
 
