@@ -559,4 +559,26 @@ defmodule ExAws.SQS.ParserTest do
 
     assert "e5cca473-4fc0-4198-a451-8abb94d02c75" == response[:request_id]
   end
+
+  test "handling list tags response" do
+    rsp =
+      """
+      <ListQueueTagsResponse>
+        <ListQueueTagsResult>
+          <Tag>
+            <Key>Key1</Key>
+            <Value>Value1</Value>
+          </Tag>
+          <Tag>
+            <Key>Key2</Key>
+            <Value>Value2</Value>
+          </Tag>
+        </ListQueueTagsResult>
+      </ListQueueTagsResponse>
+      """
+      |> to_success
+
+    {:ok, %{body: response}} = Parsers.parse(rsp, :list_queue_tags)
+    assert response[:tags] == [%{key: "Key1", value: "Value1"}, %{key: "Key2", value: "Value2"}]
+  end
 end
