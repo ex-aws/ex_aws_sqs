@@ -172,6 +172,15 @@ if Code.ensure_loaded?(SweetXml) do
       parse_request_id(resp, ~x"//SetQueueAttributesResponse")
     end
 
+    def parse({:ok, %{body: xml} = resp}, :list_queue_tags) do
+      parsed_body =
+        xml
+        |> SweetXml.xpath(~x"//ListQueueTagsResponse/ListQueueTagsResult",
+          tags: [~x"./Tag"l, key: ~x"./Key/text()"s, value: ~x"./Value/text()"s]
+        )
+
+      {:ok, Map.put(resp, :body, parsed_body)}
+    end
 
     def parse(val, _), do: val
 

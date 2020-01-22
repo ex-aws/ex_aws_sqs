@@ -158,10 +158,11 @@ defmodule ExAws.SQS do
   """
   @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t
   @spec create_queue(queue_name :: binary, queue_attributes :: queue_attributes) :: ExAws.Operation.Query.t
-  def create_queue(queue_name, attributes \\ []) do
+  def create_queue(queue_name, attributes \\ [], tags \\ %{}) do
     params =
       attributes
       |> build_attrs
+      |> add_tags_to_params(tags)
       |> Map.put("QueueName", queue_name)
 
     request(nil, :create_queue, params)
@@ -427,6 +428,60 @@ defmodule ExAws.SQS do
       |> build_attrs
 
     request(queue_url, :set_queue_attributes, params)
+  end
+
+  @doc """
+  List tags of a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListQueueTags.html)
+  """
+  @spec list_queue_tags(queue_url :: binary) :: ExAws.Operation.Query.t()
+  def list_queue_tags(queue_url) do
+    request(queue_url, :list_queue_tags, %{})
+  end
+
+  @doc """
+  Apply tags to a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_TagQueue.html)
+  """
+  @spec tag_queue(queue_url :: binary, tags :: map) :: ExAws.Operation.Query.t()
+  def tag_queue(queue_url, tags) do
+    params = add_tags_to_params(tags)
+
+    request(queue_url, :tag_queue, params)
+  end
+
+  @doc """
+  Remove tags from a SQS Queue
+
+  [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_UntagQueue.html)
+  """
+  @spec untag_queue(queue_url :: binary, tag_keys :: list) :: ExAws.Operation.Query.t()
+  def untag_queue(queue_url, tag_keys) do
+    params = format_untag_list(tag_keys)
+    request(queue_url, :untag_queue, params)
+  end
+
+  defp format_untag_list(tag_keys) do
+    tag_keys
+    |> Enum.with_index(1)
+    |> Enum.reduce(%{}, fn {k, i}, acc -> Map.put(acc, "TagKey.#{i}", k) end)
+  end
+
+  defp add_tags_to_params(tags), do: add_tags_to_params(%{}, tags)
+
+  defp add_tags_to_params(params, tags) do
+    tags
+    |> Enum.with_index(1)
+    |> Enum.reduce(%{}, fn {{k, v}, i}, acc -> create_tag(acc, k, v, i) end)
+    |> Map.merge(params)
+  end
+
+  defp create_tag(acc, key, value, index) do
+    acc
+    |> Map.put("Tag.#{index}.Key", key)
+    |> Map.put("Tag.#{index}.Value", value)
   end
 
   defp request(nil, action, params) do

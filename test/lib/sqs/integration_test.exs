@@ -7,7 +7,7 @@ defmodule ExAws.SQSIntegrationTest do
   setup_all do
     ExAws.Config.new(:sqs)
 
-    {:ok, %{body: %{queue_url: queue_url}}} = SQS.create_queue(@queue_name) |> ExAws.request()
+    {:ok, %{body: %{queue_url: queue_url}}} = SQS.create_queue(@queue_name, [], %{tag1: "value"}) |> ExAws.request()
 
     [queue_url: queue_url]
   end
@@ -109,6 +109,16 @@ defmodule ExAws.SQSIntegrationTest do
     assert queue_url |> String.contains?(queue_name)
   end
 
+  test "create_queue/3" do
+    queue_name = "test_queue_with_tags"
+
+    assert {:ok, %{body: %{queue_url: queue_url}}} =
+             SQS.create_queue(queue_name, %{tag1: "foo", tag2: "bar"})
+             |> ExAws.request()
+
+    assert queue_url |> String.contains?(queue_name)
+  end
+
   test "delete_message/2", context do
     assert {:ok, %{body: %{request_id: _}}} =
              SQS.delete_message(context.queue_url, "a_receipt_handle") |> ExAws.request()
@@ -182,8 +192,10 @@ defmodule ExAws.SQSIntegrationTest do
     assert is_list(queues)
   end
 
-  @tag :skip
-  test "list_queue_tags NOT IMPLEMENTED"
+  test "list_queue_tags/1", context do
+    assert {:ok, %{body: %{tags: tags}}} = SQS.list_queue_tags(context.queue_url) |> ExAws.request()
+    assert is_list(tags)
+  end
 
   test "purge_queue/1", context do
     assert {:ok, %{body: %{request_id: _}}} =
@@ -301,9 +313,11 @@ defmodule ExAws.SQSIntegrationTest do
              |> ExAws.request()
   end
 
-  @tag :skip
-  test "tag_queue NOT IMPLEMENTED"
+  test "tag_queue/2", context do
+    assert {:ok, _} = SQS.tag_queue(context.queue_url, %{foo: "bar"}) |> ExAws.request()
+  end
 
-  @tag :skip
-  test "untag_queue NOT IMPLEMENTED"
+  test "untag_queue/2", context do
+    assert {:ok, _} = SQS.untag_queue(context.queue_url, [:foo, "foo2"]) |> ExAws.request()
+  end
 end
