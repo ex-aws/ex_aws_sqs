@@ -13,15 +13,26 @@ along with `:ex_aws` and your preferred JSON codec / http client
 def deps do
   [
     {:ex_aws, "~> 2.0"},
-    {:ex_aws_sqs, "~> 3.1"},
+    {:ex_aws_sqs, "~> 3.2"},
     {:poison, "~> 3.0"},
     {:hackney, "~> 1.9"},
-    {:sweet_xml, "~> 0.6"},
+    {:saxy, "~> 1.1"}, # or {:sweet_xml, "~> 0.6"}
   ]
 end
 ```
 
 Documentation can be found at [https://hexdocs.pm/ex_aws_sqs](https://hexdocs.pm/ex_aws_sqs).
+
+## XML Parser
+
+By default `ex_aws_sqs` will use either `:sweet_xml` or `:saxy` to parse the XML responses from AWS, depending on which is installed. If both libraries are installed then `:saxy` will be choosen first. To explicitly choose either parser then set the `:parser` in your config:
+```elixir
+config :ex_aws_sqs, parser: ExAws.SQS.SaxyParser
+# OR
+config :ex_aws_sqs, parser: ExAws.SQS.SweetXmlParser
+```
+
+But ensure no other dependencies are setting this value.
 
 ## License
 
