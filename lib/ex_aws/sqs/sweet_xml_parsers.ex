@@ -1,5 +1,5 @@
 if Code.ensure_loaded?(SweetXml) do
-  defmodule ExAws.SQS.Parsers do
+  defmodule ExAws.SQS.SweetXmlParser do
     use ExAws.Operation.Query.Parser
 
     def parse({:ok, %{body: xml}=resp}, :list_queues) do
@@ -276,10 +276,5 @@ if Code.ensure_loaded?(SweetXml) do
     defp request_id_xpath do
       ~x"./ResponseMetadata/RequestId/text()"s
     end
-  end
-else
-  defmodule ExAws.SQS.Parsers do
-    def parse(_val, _), do: raise ExAws.Error, "Missing XML parser. Please see docs"
-
   end
 end
