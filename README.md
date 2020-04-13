@@ -14,9 +14,7 @@ def deps do
   [
     {:ex_aws, "~> 2.0"},
     {:ex_aws_sqs, "~> 3.1"},
-    {:poison, "~> 3.0"},
     {:hackney, "~> 1.9"},
-    {:sweet_xml, "~> 0.6"},
   ]
 end
 ```
