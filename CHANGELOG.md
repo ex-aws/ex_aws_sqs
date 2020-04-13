@@ -1,3 +1,8 @@
+v3.2.0
+
+- Added optional support for [saxy](https://hex.pm/packages/saxy) XML parser
+- Saxy parser set as default parser if both `:saxy` and `:sweet_xml` loaded.
+
 v3.1.0
 
 - Added support for Queue Tags
