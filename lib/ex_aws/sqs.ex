@@ -495,13 +495,32 @@ defmodule ExAws.SQS do
 
   defp generate_query(action, params) do
     action_string = action |> Atom.to_string() |> Macro.camelize()
+    parser = fetch_parser!()
 
     %ExAws.Operation.Query{
       params: params |> Map.put("Action", action_string),
       service: :sqs,
       action: action,
-      parser: &ExAws.SQS.Parsers.parse/2
+      parser: &parser.parse/2
     }
+  end
+
+  defp fetch_parser!() do
+    case Application.fetch_env(:ex_aws_sqs, :parser) do
+      {:ok, parser} ->
+        parser
+
+      :error ->
+        parser =
+          cond do
+            Code.ensure_loaded?(ExAws.SQS.SaxyParser) -> ExAws.SQS.SaxyParser
+            Code.ensure_loaded?(ExAws.SQS.SweetXmlParser) -> ExAws.SQS.SweetXmlParser
+            true -> raise "no XML parser found. Please add {:saxy, \"~> 1.1\"} to your mix.exs"
+          end
+
+        Application.put_env(:ex_aws_sqs, :parser, parser)
+        parser
+    end
   end
 
   ## Helpers
