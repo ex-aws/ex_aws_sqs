@@ -1,10 +1,4 @@
 if Code.ensure_loaded?(Saxy) do
-  # TODO: Uncomment in the future
-  # IO.puts :stderr, """
-  # :ex_aws_sqs recommends using :saxy for XML parsing instead of :sweet_xml. \
-  # Please add {:saxy, "~> 1.1"} to your mix.exs.
-  # """
-
   defmodule ExAws.SQS.SaxyCollector do
     @moduledoc false
 

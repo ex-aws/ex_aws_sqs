@@ -1,5 +1,13 @@
 if Code.ensure_loaded?(SweetXml) do
   defmodule ExAws.SQS.SweetXmlParser do
+    # TODO: Uncomment in the future
+    # unless Code.ensure_loaded?(Saxy) do
+    #   IO.puts :stderr, """
+    #   :ex_aws_sqs recommends using :saxy for XML parsing instead of :sweet_xml. \
+    #   Please add {:saxy, "~> 1.1"} to your mix.exs.
+    #   """
+    # end
+
     use ExAws.Operation.Query.Parser
 
     def parse({:ok, %{body: xml}=resp}, :list_queues) do
