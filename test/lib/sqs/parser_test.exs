@@ -9,7 +9,7 @@ defmodule ExAws.SQS.ParserTest do
     describe "#{inspect(parser)}" do
       @parser parser
 
-      test "#parsing a list queue response" do
+      test "parsing a list queue response" do
         rsp = """
         <ListQueuesResponse>
           <ListQueuesResult>
@@ -25,6 +25,23 @@ defmodule ExAws.SQS.ParserTest do
         {:ok, %{body: parsed_doc}} = @parser.parse(rsp, :list_queues)
         assert parsed_doc[:queues] == ["http://sqs.us-east-1.amazonaws.com/123456789012/testQueue"]
         assert parsed_doc[:request_id] == "725275ae-0b9b-4762-b238-436d7c65a1ac"
+      end
+
+      test "parsing an empty list queue response" do
+        rsp = """
+        <ListQueuesResponse xmlns="http://queue.amazonaws.com/doc/2012-11-05/">
+          <ListQueuesResult>
+          </ListQueuesResult>
+          <ResponseMetadata>
+            <RequestId>00000000-0000-0000-0000-000000000000</RequestId>
+          </ResponseMetadata>
+        </ListQueuesResponse>
+        """
+        |> to_success
+
+        {:ok, %{body: parsed_doc}} = @parser.parse(rsp, :list_queues)
+        assert parsed_doc[:queues] == []
+        assert parsed_doc[:request_id] == "00000000-0000-0000-0000-000000000000"
       end
 
       test "parsing a create queue response" do

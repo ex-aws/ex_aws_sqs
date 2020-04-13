@@ -1,5 +1,5 @@
 if Code.ensure_loaded?(Saxy) do
-  # Uncomment in the future
+  # TODO: Uncomment in the future
   # IO.puts :stderr, """
   # :ex_aws_sqs recommends using :saxy for XML parsing instead of :sweet_xml. \
   # Please add {:saxy, "~> 1.1"} to your mix.exs.
@@ -9,11 +9,14 @@ if Code.ensure_loaded?(Saxy) do
     @moduledoc false
 
     def build(path, [_ | _] = attrs) when is_list(path) do
-      path
-      |> Enum.reverse()
-      |> Enum.reduce(build_attrs(attrs, %{}), fn key, acc ->
-        %{key => acc}
-      end)
+      definition =
+        path
+        |> Enum.reverse()
+        |> Enum.reduce(build_attrs(attrs, %{}), fn key, acc ->
+          %{key => acc}
+        end)
+
+      {default_for(attrs), definition}
     end
 
     defp build_attrs(attrs, acc) do
@@ -105,8 +108,8 @@ if Code.ensure_loaded?(Saxy) do
     @behaviour Saxy.Handler
 
     @impl true
-    def handle_event(:start_document, _prolog, definition) do
-      {:ok, {%{}, [{"root", nil, definition}]}}
+    def handle_event(:start_document, _prolog, {default, definition}) do
+      {:ok, {default, [{"root", nil, definition}]}}
     end
 
     # When skipping
@@ -150,7 +153,8 @@ if Code.ensure_loaded?(Saxy) do
       end
     end
 
-    def handle_event(:characters, chars, {_, [{_, _, transformer} | _] = stack}) when is_function(transformer) do
+    def handle_event(:characters, chars, {_, [{_, _, transformer} | _] = stack})
+        when is_function(transformer) do
       {:ok, {transformer.(chars), stack}}
     end
 
@@ -186,7 +190,10 @@ if Code.ensure_loaded?(Saxy) do
     end
 
     defp maybe_reverse_map({:reverse, tag, _attr, map}, tag), do: map
-    defp maybe_reverse_map({:reverse, _, attr, map}, _), do: Map.update!(map, attr, &Enum.reverse/1)
+
+    defp maybe_reverse_map({:reverse, _, attr, map}, _),
+      do: Map.update!(map, attr, &Enum.reverse/1)
+
     defp maybe_reverse_map(map, _tag), do: map
   end
 end
