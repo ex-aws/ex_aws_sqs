@@ -519,6 +519,7 @@ defmodule ExAws.SQS do
           end
 
         Application.put_env(:ex_aws_sqs, :parser, parser)
+        parser
     end
   end
 
