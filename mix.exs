@@ -45,8 +45,8 @@ defmodule ExAws.SQS.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:hackney, ">= 0.0.0", only: [:dev, :test]},
-      {:saxy, "~> 1.1", only: [:dev, :test]},
-      {:sweet_xml, ">= 0.0.0", only: [:dev, :test]},
+      {:saxy, "~> 1.1", optional: true},
+      {:sweet_xml, ">= 0.0.0", optional: true},
       ex_aws(),
     ]
   end
