@@ -1,3 +1,7 @@
+v3.2.1
+
+- Updated mix deps for `:saxy` & `:sweet_xml` to be marked optional 
+
 v3.2.0
 
 - Added optional support for [saxy](https://hex.pm/packages/saxy) XML parser
