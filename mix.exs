@@ -9,34 +9,35 @@ defmodule ExAws.SQS.Mixfile do
     [
       app: :ex_aws_sqs,
       name: "ExAws.SQS",
-      description: "ExAws.SQS service package",
-      package: %{
-        files: [
-          "lib",
-          "mix.exs",
-        ],
-        licenses: [ "MIT" ],
-        links: %{
-          "Docs" => @url_docs,
-          "GitHub" => @url_github
-        },
-        maintainers: ["Ben Wilson"]
-      }, 
       version: @version,
       elixir: "~> 1.5",
-      elixirc_paths: elixirc_paths(Mix.env),
-      start_permanent: Mix.env == :prod,
-      deps: deps()
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      docs: docs(),
+      package: package()
     ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib",]
+  defp elixirc_paths(_), do: ["lib"]
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
+    ]
+  end
+
+  defp package do
+    [
+      description: "ExAws.SQS service package",
+      maintainers: ["Ben Wilson"],
+      files: ["lib", "mix.exs", "CHANGELOG.md", "README.md", "CONTRIBUTING.md"],
+      licenses: ["MIT"],
+      links: %{
+        "Changelog" => "#{@url_docs}/changelog.html",
+        "GitHub" => @url_github
+      }
     ]
   end
 
@@ -47,7 +48,17 @@ defmodule ExAws.SQS.Mixfile do
       {:hackney, ">= 0.0.0", only: [:dev, :test]},
       {:saxy, "~> 1.1", optional: true},
       {:sweet_xml, ">= 0.0.0", optional: true},
-      ex_aws(),
+      ex_aws()
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["CHANGELOG.md", "README.md"],
+      main: "readme",
+      source_url: @url_github,
+      source_ref: "#v{@version}",
+      formatters: ["html"]
     ]
   end
 
