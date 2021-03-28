@@ -24,9 +24,12 @@ defmodule ExAws.SQS.Mixfile do
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: extra_applications(Mix.env())
     ]
   end
+
+  defp extra_applications(:test), do: [:logger, :hackney]
+  defp extra_applications(_), do: [:logger]
 
   defp package do
     [
@@ -45,7 +48,8 @@ defmodule ExAws.SQS.Mixfile do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:hackney, ">= 0.0.0", only: [:dev, :test]},
+      {:hackney, "~> 1.9", optional: true},
+      {:jason, "~> 1.1", optional: true},
       {:saxy, "~> 1.1", optional: true},
       {:sweet_xml, ">= 0.0.0", optional: true},
       ex_aws()
