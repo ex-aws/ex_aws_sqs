@@ -8,7 +8,8 @@ defmodule ExAws.SQSIntegrationTest do
   setup_all do
     ExAws.Config.new(:sqs)
 
-    {:ok, %{body: %{queue_url: queue_url}}} = SQS.create_queue(@queue_name, [], %{tag1: "value"}) |> ExAws.request()
+    {:ok, %{body: %{queue_url: queue_url}}} =
+      SQS.create_queue(@queue_name, [], %{tag1: "value"}) |> ExAws.request()
 
     [queue_url: queue_url]
   end
@@ -194,7 +195,9 @@ defmodule ExAws.SQSIntegrationTest do
   end
 
   test "list_queue_tags/1", context do
-    assert {:ok, %{body: %{tags: tags}}} = SQS.list_queue_tags(context.queue_url) |> ExAws.request()
+    assert {:ok, %{body: %{tags: tags}}} =
+             SQS.list_queue_tags(context.queue_url) |> ExAws.request()
+
     assert is_list(tags)
   end
 
