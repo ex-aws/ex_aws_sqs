@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.0 - 2021-03-28
+
+- Updated min elixir version to 1.7
+- Updated ex_aws dependency from "~> 2.0" -> "~> 2.1"
+- documentation and formating updates
+
 ## v3.2.1 - 2020-04-14
 
 - Updated mix deps for `:saxy` & `:sweet_xml` to be marked optional
