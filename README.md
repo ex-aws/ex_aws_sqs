@@ -1,13 +1,17 @@
 # ExAws.SQS
-[![Hex version](https://img.shields.io/hexpm/v/ex_aws_sqs.svg "Hex
-version")](https://hex.pm/packages/ex_aws_sqs)
 
-Service module for https://github.com/ex-aws/ex_aws
+[![Module Version](https://img.shields.io/hexpm/v/ex_aws_sqs.svg)](https://hex.pm/packages/ex_aws_sqs)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ex_aws_sqs/)
+[![Total Download](https://img.shields.io/hexpm/dt/ex_aws_sqs.svg)](https://hex.pm/packages/ex_aws_sqs)
+[![License](https://img.shields.io/hexpm/l/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/ex-aws/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs/commits/master)
+
+Service module for [https://github.com/ex-aws/ex_aws](https://github.com/ex-aws/ex_aws).
 
 ## Installation
 
-The package can be installed by adding `ex_aws_sqs` to your list of dependencies in `mix.exs`
-along with `:ex_aws` and your preferred JSON codec / http client
+The package can be installed by adding `:ex_aws_sqs` to your list of dependencies in `mix.exs`
+along with `:ex_aws` and your preferred JSON codec / HTTP client:
 
 ```elixir
 def deps do
@@ -21,11 +25,9 @@ def deps do
 end
 ```
 
-Documentation can be found at [https://hexdocs.pm/ex_aws_sqs](https://hexdocs.pm/ex_aws_sqs).
-
 ## XML Parser
 
-By default `ex_aws_sqs` will use either `:sweet_xml` or `:saxy` to parse the XML responses from AWS, depending on which is installed. If both libraries are installed then `:saxy` will be choosen first. To explicitly choose either parser then set the `:parser` in your config:
+By default `:ex_aws_sqs` will use either `:sweet_xml` or `:saxy` to parse the XML responses from AWS, depending on which is installed. If both libraries are installed then `:saxy` will be choosen first. To explicitly choose either parser then set the `:parser` in your config:
 ```elixir
 config :ex_aws_sqs, parser: ExAws.SQS.SaxyParser
 # OR
@@ -34,7 +36,7 @@ config :ex_aws_sqs, parser: ExAws.SQS.SweetXmlParser
 
 But ensure no other dependencies are setting this value.
 
-## License
+## Copyright and License
 
 The MIT License (MIT)
 

@@ -1,6 +1,6 @@
 defmodule ExAws.SQS do
   @moduledoc """
-  Operations on AWS SQS
+  Operations on AWS SQS.
   """
 
   @type sqs_permission ::
@@ -87,7 +87,7 @@ defmodule ExAws.SQS do
 
   @doc """
   Extends the read lock timeout for the specified message from
-  the specified queue to the specified value
+  the specified queue to the specified value.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibility.html)
   """
@@ -97,7 +97,7 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  Extends the read lock timeout for a batch of 1..10 messages
+  Extends the read lock timeout for a batch of 1..10 messages.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibilityBatch.html)
   """
@@ -119,41 +119,41 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  Create queue
+  Create queue.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html)
 
   ## Attributes
 
-    * `:delay_seconds` - The length of time, in seconds, for which the delivery of all messages in the queue is delayed. Valid values: An integer from 0 to 900 seconds (15 minutes). Default: 0. 
-    
-    * `:maximum_message_size` - The limit of how many bytes a message can contain before Amazon SQS rejects it. Valid values: An integer from 1,024 bytes (1 KiB) to 262,144 bytes (256 KiB). Default: 262,144 (256 KiB). 
+    * `:delay_seconds` - The length of time, in seconds, for which the delivery of all messages in the queue is delayed. Valid values: An integer from 0 to 900 seconds (15 minutes). Default: 0.
+
+    * `:maximum_message_size` - The limit of how many bytes a message can contain before Amazon SQS rejects it. Valid values: An integer from 1,024 bytes (1 KiB) to 262,144 bytes (256 KiB). Default: 262,144 (256 KiB).
 
     * `:message_retention_period` - The length of time, in seconds, for which Amazon SQS retains a message. Valid values: An integer from 60 seconds (1 minute) to 1,209,600 seconds (14 days). Default: 345,600 (4 days).
-    
-    * `:policy` - The queue's policy. A valid AWS policy. For more information about policy structure, see [Overview of AWS IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/PoliciesOverview.html) in the Amazon IAM User Guide. 
+
+    * `:policy` - The queue's policy. A valid AWS policy. For more information about policy structure, see [Overview of AWS IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/PoliciesOverview.html) in the Amazon IAM User Guide.
 
     * `:receive_message_wait_time_seconds` - The length of time, in seconds, for which a [ReceiveMessage](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) action waits for a message to arrive. Valid values: An integer from 0 to 20 (seconds). Default: 0.
 
-    * `:redrive_policy` - The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object. For more information about the redrive policy and dead-letter queues, see [Using Amazon SQS Dead-Letter Queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html) in the Amazon Simple Queue Service Developer Guide. 
+    * `:redrive_policy` - The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object. For more information about the redrive policy and dead-letter queues, see [Using Amazon SQS Dead-Letter Queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html) in the Amazon Simple Queue Service Developer Guide.
       * `deadLetterTargetArn` – The Amazon Resource Name (ARN) of the dead-letter queue to which Amazon SQS moves messages after the value of maxReceiveCount is exceeded.
 
       * `maxReceiveCount` – The number of times a message is delivered to the source queue before being moved to the dead-letter queue. When the ReceiveCount for a message exceeds the maxReceiveCount for a queue, Amazon SQS moves the message to the dead-letter-queue.
 
       *Note*
-      
+
       The dead-letter queue of a FIFO queue must also be a FIFO queue. Similarly, the dead-letter queue of a standard queue must also be a standard queue.
 
-    * `:visibility_timeout` - The visibility timeout for the queue, in seconds. Valid values: An integer from 0 to 43,200 (12 hours). Default: 30. For more information about the visibility timeout, see [Visibility Timeout](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html) in the Amazon Simple Queue Service Developer Guide. 
-    
+    * `:visibility_timeout` - The visibility timeout for the queue, in seconds. Valid values: An integer from 0 to 43,200 (12 hours). Default: 30. For more information about the visibility timeout, see [Visibility Timeout](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html) in the Amazon Simple Queue Service Developer Guide.
+
     * `:fifo_queue` - Designates a queue as FIFO. Valid values: true, false. If you don't specify the FifoQueue attribute, Amazon SQS creates a standard queue. You can provide this attribute only during queue creation. You can't change it for an existing queue. When you set this attribute, you must also provide the MessageGroupId for your messages explicitly.
       For more information, see [FIFO Queue Logic](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-understanding-logic) in the Amazon Simple Queue Service Developer Guide.
-    
-    * `:content_based_deduplication` - Enables content-based deduplication. Valid values: true, false. For more information, see [Exactly-Once Processing](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-exactly-once-processing) in the Amazon Simple Queue Service Developer Guide. 
 
-    * `:kms_master_key_id` - The ID of an AWS-managed customer master key (CMK) for Amazon SQS or a custom CMK. For more information, see [Key Terms](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-sse-key-terms). While the alias of the AWS-managed CMK for Amazon SQS is always alias/aws/sqs, the alias of a custom CMK can, for example, be alias/MyAlias . For more examples, see [KeyId](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html#API_DescribeKey_RequestParameters) in the AWS Key Management Service API Reference. 
+    * `:content_based_deduplication` - Enables content-based deduplication. Valid values: true, false. For more information, see [Exactly-Once Processing](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html#FIFO-queues-exactly-once-processing) in the Amazon Simple Queue Service Developer Guide.
 
-    * `:kms_data_key_reuse_period_seconds` - The length of time, in seconds, for which Amazon SQS can reuse a [data key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) to encrypt or decrypt messages before calling AWS KMS again. An integer representing seconds, between 60 seconds (1 minute) and 86,400 seconds (24 hours). Default: 300 (5 minutes). A shorter time period provides better security but results in more calls to KMS which might incur charges after Free Tier. For more information, see [How Does the Data Key Reuse Period Work?](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work). 
+    * `:kms_master_key_id` - The ID of an AWS-managed customer master key (CMK) for Amazon SQS or a custom CMK. For more information, see [Key Terms](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-sse-key-terms). While the alias of the AWS-managed CMK for Amazon SQS is always alias/aws/sqs, the alias of a custom CMK can, for example, be alias/MyAlias . For more examples, see [KeyId](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html#API_DescribeKey_RequestParameters) in the AWS Key Management Service API Reference.
+
+    * `:kms_data_key_reuse_period_seconds` - The length of time, in seconds, for which Amazon SQS can reuse a [data key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) to encrypt or decrypt messages before calling AWS KMS again. An integer representing seconds, between 60 seconds (1 minute) and 86,400 seconds (24 hours). Default: 300 (5 minutes). A shorter time period provides better security but results in more calls to KMS which might incur charges after Free Tier. For more information, see [How Does the Data Key Reuse Period Work?](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work).
 
   """
   @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t
@@ -295,13 +295,13 @@ defmodule ExAws.SQS do
   Read messages from a SQS Queue
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html)
-  
+
   ## Options
 
     * `:attribute_names` - `:all` or a list of `AttributeNames` to include in the response. Valid attributes are:
-    [:sender_id, :sent_timestamp, :approximate_receive_count, :approximate_first_receive_timestamp, :sequence_number, :message_deduplication_id, :message_group_id, :aws_trace_header] 
+    [:sender_id, :sent_timestamp, :approximate_receive_count, :approximate_first_receive_timestamp, :sequence_number, :message_deduplication_id, :message_group_id, :aws_trace_header]
 
-    * `:message_attribute_names` - List of message attributes to include.    
+    * `:message_attribute_names` - List of message attributes to include.
 
       * The name can contain alphanumeric characters and the underscore (_), hyphen (-), and period (.).
 
@@ -313,17 +313,17 @@ defmodule ExAws.SQS do
 
       * The name can be up to 256 characters long.
 
-      When using ReceiveMessage, you can send a list of attribute names to receive, or you can return all of the attributes by specifying All or .* in your request. You can also use all message attributes starting with a prefix, for example bar.*. 
+      When using ReceiveMessage, you can send a list of attribute names to receive, or you can return all of the attributes by specifying All or .* in your request. You can also use all message attributes starting with a prefix, for example bar.*.
 
-    * `:max_number_of_messages` - The maximum number of messages to return. Amazon SQS never returns more messages than this value (however, fewer messages might be returned). Valid values: 1 to 10. Default: 1. 
+    * `:max_number_of_messages` - The maximum number of messages to return. Amazon SQS never returns more messages than this value (however, fewer messages might be returned). Valid values: 1 to 10. Default: 1.
 
-    * `:visibility_timeout` - The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request. 
+    * `:visibility_timeout` - The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request.
 
     * `:wait_time_seconds` - The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner than WaitTimeSeconds. If no messages are available and the wait time expires, the call returns successfully with an empty list of messages.
 
     * `:receive_request_attempt_id` - This parameter applies only to FIFO (first-in-first-out) queues.
 
-      The token used for deduplication of ReceiveMessage calls. If a networking issue occurs after a ReceiveMessage action, and instead of a response you receive a generic error, it is possible to retry the same action with an identical ReceiveRequestAttemptId to retrieve the same set of messages, even if their visibility timeout has not yet expired. 
+      The token used for deduplication of ReceiveMessage calls. If a networking issue occurs after a ReceiveMessage action, and instead of a response you receive a generic error, it is possible to retry the same action with an identical ReceiveRequestAttemptId to retrieve the same set of messages, even if their visibility timeout has not yet expired.
   """
   @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t
   @spec receive_message(queue_url :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
@@ -366,7 +366,7 @@ defmodule ExAws.SQS do
 
   ## Options
 
-    * `:delay_seconds` - The length of time, in seconds, for which to delay a specific message. Valid values: 0 to 900. Maximum: 15 minutes. Messages with a positive DelaySeconds value become available for processing after the delay period is finished. If you don't specify a value, the default value for the queue applies. 
+    * `:delay_seconds` - The length of time, in seconds, for which to delay a specific message. Valid values: 0 to 900. Maximum: 15 minutes. Messages with a positive DelaySeconds value become available for processing after the delay period is finished. If you don't specify a value, the default value for the queue applies.
 
     * `:message_attributes` - Each message attribute consists of a Name, Type, and Value. For more information, see [Amazon SQS Message Attributes](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-attributes.html) in the Amazon Simple Queue Service Developer Guide.
 
@@ -400,7 +400,7 @@ defmodule ExAws.SQS do
     ]
 
   @doc """
-  Send up to 10 messages to a SQS Queue in a single request
+  Send up to 10 messages to a SQS Queue in a single request.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessageBatch.html)
   """
@@ -417,7 +417,7 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  Set attributes of a SQS Queue
+  Set attributes of a SQS Queue.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html)
   """
@@ -431,7 +431,7 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  List tags of a SQS Queue
+  List tags of a SQS Queue.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListQueueTags.html)
   """
@@ -441,7 +441,7 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  Apply tags to a SQS Queue
+  Apply tags to a SQS Queue.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_TagQueue.html)
   """
@@ -453,7 +453,7 @@ defmodule ExAws.SQS do
   end
 
   @doc """
-  Remove tags from a SQS Queue
+  Remove tags from a SQS Queue.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_UntagQueue.html)
   """
@@ -676,5 +676,4 @@ defmodule ExAws.SQS do
   defp message_attr_value(param, prefix, %{value: value}) do
     Map.put(param, prefix <> "Value.StringValue", value)
   end
-
 end
