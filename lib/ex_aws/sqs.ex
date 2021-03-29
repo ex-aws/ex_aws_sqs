@@ -4,12 +4,12 @@ defmodule ExAws.SQS do
   """
 
   @type sqs_permission ::
-    :send_message |
-    :receive_message |
-    :delete_message |
-    :change_message_visibility |
-    :get_queue_attributes
-  @type sqs_acl :: %{ binary => :all | [sqs_permission, ...]}
+          :send_message
+          | :receive_message
+          | :delete_message
+          | :change_message_visibility
+          | :get_queue_attributes
+  @type sqs_acl :: %{binary => :all | [sqs_permission, ...]}
 
   # Values taken from
   # https://github.com/aws/aws-sdk-go/blob/075b1d697ba8dbab8bb841042fa12d43192d0153/models/apis/sqs/2012-11-05/api-2.json#L752.
@@ -17,57 +17,57 @@ defmodule ExAws.SQS do
   # https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html, but they match the
   # ones described in prose under the respective section.
   @type sqs_message_attribute_name ::
-    :sender_id |
-    :sent_timestamp |
-    :approximate_receive_count |
-    :approximate_first_receive_timestamp |
-    :sequence_number |
-    :message_deduplication_id |
-    :message_group_id |
-    :aws_trace_header
+          :sender_id
+          | :sent_timestamp
+          | :approximate_receive_count
+          | :approximate_first_receive_timestamp
+          | :sequence_number
+          | :message_deduplication_id
+          | :message_group_id
+          | :aws_trace_header
 
   @type sqs_queue_attribute_name ::
-    :policy
-    | :visibility_timeout
-    | :maximum_message_size
-    | :message_retention_period
-    | :approximate_number_of_messages
-    | :approximate_number_of_messages_not_visible
-    | :created_timestamp
-    | :last_modified_timestamp
-    | :queue_arn
-    | :approximate_number_of_messages_delayed
-    | :delay_seconds
-    | :receive_message_wait_time_seconds
-    | :redrive_policy
-    | :fifo_queue
-    | :content_based_deduplication
+          :policy
+          | :visibility_timeout
+          | :maximum_message_size
+          | :message_retention_period
+          | :approximate_number_of_messages
+          | :approximate_number_of_messages_not_visible
+          | :created_timestamp
+          | :last_modified_timestamp
+          | :queue_arn
+          | :approximate_number_of_messages_delayed
+          | :delay_seconds
+          | :receive_message_wait_time_seconds
+          | :redrive_policy
+          | :fifo_queue
+          | :content_based_deduplication
   @type visibility_timeout :: 0..43200
   @type queue_attributes :: [
-    {:policy, binary}
-    | {:visibility_timeout, visibility_timeout}
-    | {:maximum_message_size, 1024..262144}
-    | {:message_retention_period, 60..1209600}
-    | {:approximate_number_of_messages, binary}
-    | {:approximate_number_of_messages_not_visible, binary}
-    | {:created_timestamp, binary}
-    | {:last_modified_timestamp, binary}
-    | {:queue_arn, binary}
-    | {:approximate_number_of_messages_delayed, binary}
-    | {:delay_seconds, 0..900}
-    | {:receive_message_wait_time_seconds, 0..20}
-    | {:redrive_policy, binary}
-    | {:fifo_queue, boolean}
-    | {:content_based_deduplication, boolean}
-    | {:kms_master_key_id, binary}
-    | {:kms_data_key_reuse_period_seconds, 60..86400}
-  ]
+          {:policy, binary}
+          | {:visibility_timeout, visibility_timeout}
+          | {:maximum_message_size, 1024..262_144}
+          | {:message_retention_period, 60..1_209_600}
+          | {:approximate_number_of_messages, binary}
+          | {:approximate_number_of_messages_not_visible, binary}
+          | {:created_timestamp, binary}
+          | {:last_modified_timestamp, binary}
+          | {:queue_arn, binary}
+          | {:approximate_number_of_messages_delayed, binary}
+          | {:delay_seconds, 0..900}
+          | {:receive_message_wait_time_seconds, 0..20}
+          | {:redrive_policy, binary}
+          | {:fifo_queue, boolean}
+          | {:content_based_deduplication, boolean}
+          | {:kms_master_key_id, binary}
+          | {:kms_data_key_reuse_period_seconds, 60..86400}
+        ]
   @type sqs_message_attribute :: %{
-    :name => binary,
-    :data_type => :string | :binary | :number,
-    :custom_type => binary | none,
-    :value => binary | number
-  }
+          :name => binary,
+          :data_type => :string | :binary | :number,
+          :custom_type => binary | none,
+          :value => binary | number
+        }
 
   @doc """
   Adds a permission with the provided label to the Queue
@@ -75,7 +75,8 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_AddPermission.html)
   """
-  @spec add_permission(queue_url :: binary, label :: binary, permissions :: sqs_acl) :: ExAws.Operation.Query.t
+  @spec add_permission(queue_url :: binary, label :: binary, permissions :: sqs_acl) ::
+          ExAws.Operation.Query.t()
   def add_permission(queue_url, label, permissions \\ %{}) do
     params =
       permissions
@@ -91,9 +92,16 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibility.html)
   """
-  @spec change_message_visibility(queue_url :: binary, receipt_handle :: binary, visibility_timeout :: visibility_timeout) :: ExAws.Operation.Query.t
+  @spec change_message_visibility(
+          queue_url :: binary,
+          receipt_handle :: binary,
+          visibility_timeout :: visibility_timeout
+        ) :: ExAws.Operation.Query.t()
   def change_message_visibility(queue_url, receipt_handle, visibility_timeout) do
-    request(queue_url, :change_message_visibility, %{"ReceiptHandle" => receipt_handle, "VisibilityTimeout" => visibility_timeout})
+    request(queue_url, :change_message_visibility, %{
+      "ReceiptHandle" => receipt_handle,
+      "VisibilityTimeout" => visibility_timeout
+    })
   end
 
   @doc """
@@ -102,16 +110,19 @@ defmodule ExAws.SQS do
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibilityBatch.html)
   """
   @type message_visibility_batch_item :: %{
-    :id => binary,
-    :receipt_handle => binary,
-    :visibility_timeout => visibility_timeout
-  }
-  @spec change_message_visibility_batch(queue_url :: binary, opts :: [message_visibility_batch_item, ...]) :: ExAws.Operation.Query.t
+          :id => binary,
+          :receipt_handle => binary,
+          :visibility_timeout => visibility_timeout
+        }
+  @spec change_message_visibility_batch(
+          queue_url :: binary,
+          opts :: [message_visibility_batch_item, ...]
+        ) :: ExAws.Operation.Query.t()
   def change_message_visibility_batch(queue_url, messages) do
     params =
       messages
-      |> Enum.with_index
-      |> Enum.reduce(%{}, fn({message, index}, params) ->
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {message, index}, params ->
         Map.merge(params, format_batch_visibility_change(message, index))
       end)
 
@@ -156,8 +167,9 @@ defmodule ExAws.SQS do
     * `:kms_data_key_reuse_period_seconds` - The length of time, in seconds, for which Amazon SQS can reuse a [data key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#data-keys) to encrypt or decrypt messages before calling AWS KMS again. An integer representing seconds, between 60 seconds (1 minute) and 86,400 seconds (24 hours). Default: 300 (5 minutes). A shorter time period provides better security but results in more calls to KMS which might incur charges after Free Tier. For more information, see [How Does the Data Key Reuse Period Work?](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work).
 
   """
-  @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t
-  @spec create_queue(queue_name :: binary, queue_attributes :: queue_attributes) :: ExAws.Operation.Query.t
+  @spec create_queue(queue_name :: binary) :: ExAws.Operation.Query.t()
+  @spec create_queue(queue_name :: binary, queue_attributes :: queue_attributes) ::
+          ExAws.Operation.Query.t()
   def create_queue(queue_name, attributes \\ [], tags \\ %{}) do
     params =
       attributes
@@ -173,7 +185,7 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessage.html)
   """
-  @spec delete_message(queue_url :: binary, receipt_handle :: binary) :: ExAws.Operation.Query.t
+  @spec delete_message(queue_url :: binary, receipt_handle :: binary) :: ExAws.Operation.Query.t()
   def delete_message(queue_url, receipt_handle) do
     request(queue_url, :delete_message, %{"ReceiptHandle" => receipt_handle})
   end
@@ -184,15 +196,18 @@ defmodule ExAws.SQS do
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessageBatch.html)
   """
   @type delete_message_batch_item :: %{
-    :id => binary,
-    :receipt_handle => binary
-  }
-  @spec delete_message_batch(queue_url :: binary, message_receipts :: [delete_message_batch_item, ...]) :: ExAws.Operation.Query.t
+          :id => binary,
+          :receipt_handle => binary
+        }
+  @spec delete_message_batch(
+          queue_url :: binary,
+          message_receipts :: [delete_message_batch_item, ...]
+        ) :: ExAws.Operation.Query.t()
   def delete_message_batch(queue_url, messages) do
     params =
       messages
-      |> Enum.with_index
-      |> Enum.reduce(%{}, fn({message, index}, params) ->
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {message, index}, params ->
         Map.merge(params, format_batch_deletion(message, index))
       end)
 
@@ -204,7 +219,7 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteQueue.html)
   """
-  @spec delete_queue(queue_url :: binary) :: ExAws.Operation.Query.t
+  @spec delete_queue(queue_url :: binary) :: ExAws.Operation.Query.t()
   def delete_queue(queue_url) do
     request(queue_url, :delete_queue, %{})
   end
@@ -214,12 +229,15 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html)
   """
-  @spec get_queue_attributes(queue_url :: binary) :: ExAws.Operation.Query.t
-  @spec get_queue_attributes(queue_url :: binary, attribute_names :: :all | [sqs_queue_attribute_name, ...]) :: ExAws.Operation.Query.t
+  @spec get_queue_attributes(queue_url :: binary) :: ExAws.Operation.Query.t()
+  @spec get_queue_attributes(
+          queue_url :: binary,
+          attribute_names :: :all | [sqs_queue_attribute_name, ...]
+        ) :: ExAws.Operation.Query.t()
   def get_queue_attributes(queue_url, attributes \\ :all) do
     params =
-    attributes
-    |> format_queue_attributes
+      attributes
+      |> format_queue_attributes
 
     request(queue_url, :get_queue_attributes, params)
   end
@@ -233,10 +251,12 @@ defmodule ExAws.SQS do
 
     * `:queue_owner_aws_account_id` -  The AWS account ID of the account that created the queue.
   """
-  @spec get_queue_url(queue_name :: binary) :: ExAws.Operation.Query.t
-  @spec get_queue_url(queue_name :: binary, opts :: [queue_owner_aws_account_id: binary]) :: ExAws.Operation.Query.t
+  @spec get_queue_url(queue_name :: binary) :: ExAws.Operation.Query.t()
+  @spec get_queue_url(queue_name :: binary, opts :: [queue_owner_aws_account_id: binary]) ::
+          ExAws.Operation.Query.t()
   def get_queue_url(queue_name, opts \\ []) do
-    params = opts
+    params =
+      opts
       |> format_regular_opts
       |> Map.put("QueueName", queue_name)
 
@@ -248,7 +268,7 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListDeadLetterSourceQueues.html)
   """
-  @spec list_dead_letter_source_queues(queue_url :: binary) :: ExAws.Operation.Query.t
+  @spec list_dead_letter_source_queues(queue_url :: binary) :: ExAws.Operation.Query.t()
   def list_dead_letter_source_queues(queue_url) do
     request(queue_url, :list_dead_letter_source_queues, %{})
   end
@@ -263,11 +283,12 @@ defmodule ExAws.SQS do
     * `:queue_name_prefix` - A string to use for filtering the list results. Only those queues whose name begins with the specified string are returned.
       Queue URLs and names are case-sensitive.
   """
-  @spec list_queues() :: ExAws.Operation.Query.t
-  @spec list_queues(opts :: [queue_name_prefix: binary]) :: ExAws.Operation.Query.t
+  @spec list_queues() :: ExAws.Operation.Query.t()
+  @spec list_queues(opts :: [queue_name_prefix: binary]) :: ExAws.Operation.Query.t()
   def list_queues(opts \\ []) do
-    params = opts
-    |> format_regular_opts
+    params =
+      opts
+      |> format_regular_opts
 
     request(nil, :list_queues, params)
   end
@@ -277,19 +298,19 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_PurgeQueue.html)
   """
-  @spec purge_queue(queue_url :: binary) :: ExAws.Operation.Query.t
+  @spec purge_queue(queue_url :: binary) :: ExAws.Operation.Query.t()
   def purge_queue(queue_url) do
     request(queue_url, :purge_queue, %{})
   end
 
   @type receive_message_opts :: [
-    {:attribute_names, :all | [sqs_message_attribute_name, ...]} |
-    {:message_attribute_names, :all | [String.Chars.t, ...]} |
-    {:max_number_of_messages, 1..10} |
-    {:visibility_timeout, 0..43200} |
-    {:wait_time_seconds, 0..20} |
-    {:receive_request_attempt_id, String.t}
-  ]
+          {:attribute_names, :all | [sqs_message_attribute_name, ...]}
+          | {:message_attribute_names, :all | [String.Chars.t(), ...]}
+          | {:max_number_of_messages, 1..10}
+          | {:visibility_timeout, 0..43200}
+          | {:wait_time_seconds, 0..20}
+          | {:receive_request_attempt_id, String.t()}
+        ]
 
   @doc """
   Read messages from a SQS Queue
@@ -325,19 +346,23 @@ defmodule ExAws.SQS do
 
       The token used for deduplication of ReceiveMessage calls. If a networking issue occurs after a ReceiveMessage action, and instead of a response you receive a generic error, it is possible to retry the same action with an identical ReceiveRequestAttemptId to retrieve the same set of messages, even if their visibility timeout has not yet expired.
   """
-  @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t
-  @spec receive_message(queue_url :: binary, opts :: receive_message_opts) :: ExAws.Operation.Query.t
+  @spec receive_message(queue_url :: binary) :: ExAws.Operation.Query.t()
+  @spec receive_message(queue_url :: binary, opts :: receive_message_opts) ::
+          ExAws.Operation.Query.t()
   def receive_message(queue_url, opts \\ []) do
-    {attrs, opts} = opts
-    |> Keyword.pop(:attribute_names, [])
+    {attrs, opts} =
+      opts
+      |> Keyword.pop(:attribute_names, [])
 
-    {message_attrs, opts} = opts
-    |> Keyword.pop(:message_attribute_names, [])
+    {message_attrs, opts} =
+      opts
+      |> Keyword.pop(:message_attribute_names, [])
 
-    params = attrs
-    |> format_queue_attributes
-    |> Map.merge(format_message_attributes(message_attrs))
-    |> Map.merge(format_regular_opts(opts))
+    params =
+      attrs
+      |> format_queue_attributes
+      |> Map.merge(format_message_attributes(message_attrs))
+      |> Map.merge(format_regular_opts(opts))
 
     request(queue_url, :receive_message, params)
   end
@@ -347,17 +372,17 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_RemovePermission.html)
   """
-  @spec remove_permission(queue_url :: binary, label :: binary) :: ExAws.Operation.Query.t
+  @spec remove_permission(queue_url :: binary, label :: binary) :: ExAws.Operation.Query.t()
   def remove_permission(queue_url, label) do
     request(queue_url, :remove_permission, %{"Label" => label})
   end
 
   @type sqs_message_opts :: [
-    {:delay_seconds, 0..900} |
-    {:message_attributes, sqs_message_attribute | [sqs_message_attribute, ...]} |
-    {:message_deduplication_id, binary} |
-    {:message_group_id, binary}
-  ]
+          {:delay_seconds, 0..900}
+          | {:message_attributes, sqs_message_attribute | [sqs_message_attribute, ...]}
+          | {:message_deduplication_id, binary}
+          | {:message_group_id, binary}
+        ]
 
   @doc """
   Send a message to a SQS Queue
@@ -374,42 +399,48 @@ defmodule ExAws.SQS do
 
     * `:message_group_id` - This parameter applies only to FIFO (first-in-first-out) queues.
   """
-  @spec send_message(queue_url :: binary, message_body :: binary) :: ExAws.Operation.Query.t
-  @spec send_message(queue_url :: binary, message_body :: binary, opts :: sqs_message_opts) :: ExAws.Operation.Query.t
+  @spec send_message(queue_url :: binary, message_body :: binary) :: ExAws.Operation.Query.t()
+  @spec send_message(queue_url :: binary, message_body :: binary, opts :: sqs_message_opts) ::
+          ExAws.Operation.Query.t()
   def send_message(queue_url, message, opts \\ []) do
-    {attrs, opts} = opts
-    |> Keyword.pop(:message_attributes, [])
+    {attrs, opts} =
+      opts
+      |> Keyword.pop(:message_attributes, [])
 
     attrs = attrs |> build_message_attrs
 
-    params = opts
-    |> format_regular_opts
-    |> Map.merge(attrs)
-    |> Map.put("MessageBody", message)
+    params =
+      opts
+      |> format_regular_opts
+      |> Map.merge(attrs)
+      |> Map.put("MessageBody", message)
 
     request(queue_url, :send_message, params)
   end
 
-  @type sqs_batch_message :: binary | [
-      {:id, binary} |
-      {:message_body, binary} |
-      {:delay_seconds, 0..900} |
-      {:message_attributes, sqs_message_attribute | [sqs_message_attribute, ...]} |
-      {:message_deduplication_id, binary} |
-      {:message_group_id, binary}
-    ]
+  @type sqs_batch_message ::
+          binary
+          | [
+              {:id, binary}
+              | {:message_body, binary}
+              | {:delay_seconds, 0..900}
+              | {:message_attributes, sqs_message_attribute | [sqs_message_attribute, ...]}
+              | {:message_deduplication_id, binary}
+              | {:message_group_id, binary}
+            ]
 
   @doc """
   Send up to 10 messages to a SQS Queue in a single request.
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessageBatch.html)
   """
-  @spec send_message_batch(queue_url :: binary, messages :: [sqs_batch_message, ...]) :: ExAws.Operation.Query.t
+  @spec send_message_batch(queue_url :: binary, messages :: [sqs_batch_message, ...]) ::
+          ExAws.Operation.Query.t()
   def send_message_batch(queue_url, messages) do
     params =
       messages
-      |> Enum.with_index
-      |> Enum.reduce(%{}, fn({message, index}, params) ->
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {message, index}, params ->
         Map.merge(params, format_batch_message(message, index))
       end)
 
@@ -421,7 +452,8 @@ defmodule ExAws.SQS do
 
   [AWS API Docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html)
   """
-  @spec set_queue_attributes(queue_url :: binary, attributes :: queue_attributes) :: ExAws.Operation.Query.t
+  @spec set_queue_attributes(queue_url :: binary, attributes :: queue_attributes) ::
+          ExAws.Operation.Query.t()
   def set_queue_attributes(queue_url, attributes \\ []) do
     params =
       attributes
@@ -528,21 +560,22 @@ defmodule ExAws.SQS do
   defp format_permissions(%{} = permissions) do
     permissions
     |> expand_permissions
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(&format_permission/1)
     |> Enum.reduce(%{}, &Map.merge(&1, &2))
   end
 
   defp expand_permissions(%{} = permissions) do
-    Enum.reduce(permissions, [], fn(permission, permissions) ->
+    Enum.reduce(permissions, [], fn permission, permissions ->
       [expand_permission(permission) | permissions]
     end)
-    |> List.flatten
+    |> List.flatten()
   end
 
   defp expand_permission({account_id, :all}), do: {account_id, "*"}
+
   defp expand_permission({account_id, permissions}) do
-    Enum.map(permissions, &({account_id, &1}))
+    Enum.map(permissions, &{account_id, &1})
   end
 
   defp format_permission({{account_id, permission}, index}) do
@@ -552,23 +585,27 @@ defmodule ExAws.SQS do
   end
 
   defp format_regular_opts(opts) do
-    opts |> Enum.into(%{}, fn {k, v} ->
+    opts
+    |> Enum.into(%{}, fn {k, v} ->
       {format_param_key(k), v}
     end)
   end
 
   defp format_param_key("*"), do: "*"
-  defp format_param_key(:aws_trace_header), do: "AWSTraceHeader" # Key doesn't follow generic camelizing rule below.
+  # Key doesn't follow generic camelizing rule below.
+  defp format_param_key(:aws_trace_header), do: "AWSTraceHeader"
+
   defp format_param_key(key) do
     key
-    |> Atom.to_string
-    |> ExAws.Utils.camelize
+    |> Atom.to_string()
+    |> ExAws.Utils.camelize()
   end
 
   defp format_queue_attributes(:all), do: format_queue_attributes([:all])
+
   defp format_queue_attributes(attributes) do
     attributes
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(&format_queue_attribute/1)
     |> Enum.reduce(%{}, &Map.merge(&1, &2))
   end
@@ -589,7 +626,7 @@ defmodule ExAws.SQS do
 
   defp format_message_attributes(attributes) do
     attributes
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(&format_message_attribute/1)
     |> Enum.reduce(%{}, &Map.merge(&1, &2))
   end
@@ -597,8 +634,9 @@ defmodule ExAws.SQS do
   defp format_batch_message(message, index) do
     prefix = "SendMessageBatchRequestEntry.#{index + 1}."
 
-    {attrs, opts} = message
-    |> Keyword.pop(:message_attributes, [])
+    {attrs, opts} =
+      message
+      |> Keyword.pop(:message_attributes, [])
 
     attrs =
       attrs
@@ -607,9 +645,9 @@ defmodule ExAws.SQS do
     opts
     |> format_regular_opts
     |> Map.merge(attrs)
-    |> Enum.reduce(%{}, fn({key, value}, params) ->
-       Map.put(params, prefix <> key, value)
-     end)
+    |> Enum.reduce(%{}, fn {key, value}, params ->
+      Map.put(params, prefix <> key, value)
+    end)
   end
 
   defp format_batch_deletion(message, index) do
@@ -617,9 +655,9 @@ defmodule ExAws.SQS do
 
     message
     |> format_regular_opts
-    |> Enum.reduce(%{}, fn({key, value}, params) ->
-         Map.put(params, prefix <> key, value)
-       end)
+    |> Enum.reduce(%{}, fn {key, value}, params ->
+      Map.put(params, prefix <> key, value)
+    end)
   end
 
   defp format_batch_visibility_change(message, index) do
@@ -627,35 +665,38 @@ defmodule ExAws.SQS do
 
     message
     |> format_regular_opts
-    |> Enum.reduce(%{}, fn({key, value}, params) ->
-         Map.put(params, prefix <> key, value)
-       end)
+    |> Enum.reduce(%{}, fn {key, value}, params ->
+      Map.put(params, prefix <> key, value)
+    end)
   end
 
   defp build_attrs(attrs) do
     attrs
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(&build_attr/1)
     |> Enum.reduce(%{}, &Map.merge(&1, &2))
   end
 
   defp build_attr({{name, value}, index}) do
     prefix = "Attribute.#{index + 1}."
+
     %{}
-    |> Map.put(prefix <> "Name",  format_param_key(name))
+    |> Map.put(prefix <> "Name", format_param_key(name))
     |> Map.put(prefix <> "Value", value)
   end
 
   defp build_message_attrs(%{} = attr), do: build_message_attr({attr, 0})
+
   defp build_message_attrs(attrs) do
     attrs
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(&build_message_attr/1)
     |> Enum.reduce(%{}, &Map.merge(&1, &2))
   end
 
   defp build_message_attr({attr, index}) do
     prefix = "MessageAttribute.#{index + 1}."
+
     %{}
     |> Map.put(prefix <> "Name", attr.name)
     |> Map.put(prefix <> "Value.DataType", message_data_type(attr))
@@ -665,6 +706,7 @@ defmodule ExAws.SQS do
   defp message_data_type(%{data_type: data_type, custom_type: custom_type}) do
     format_param_key(data_type) <> "." <> custom_type
   end
+
   defp message_data_type(%{data_type: data_type}) do
     format_param_key(data_type)
   end

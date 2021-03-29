@@ -1,7 +1,7 @@
 defmodule ExAws.SQS.Mixfile do
   use Mix.Project
 
-  @version "3.2.1"
+  @version "3.3.0"
   @url_docs "https://hexdocs.pm/ex_aws_sqs"
   @url_github "https://github.com/ex-aws/ex_aws_sqs"
 
@@ -10,7 +10,7 @@ defmodule ExAws.SQS.Mixfile do
       app: :ex_aws_sqs,
       name: "ExAws.SQS",
       version: @version,
-      elixir: "~> 1.5",
+      elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -24,9 +24,12 @@ defmodule ExAws.SQS.Mixfile do
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: extra_applications(Mix.env())
     ]
   end
+
+  defp extra_applications(:test), do: [:logger, :hackney]
+  defp extra_applications(_), do: [:logger]
 
   defp package do
     [
@@ -45,7 +48,8 @@ defmodule ExAws.SQS.Mixfile do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:hackney, ">= 0.0.0", only: [:dev, :test]},
+      {:hackney, "~> 1.9", optional: true},
+      {:jason, "~> 1.1", optional: true},
       {:saxy, "~> 1.1", optional: true},
       {:sweet_xml, ">= 0.0.0", optional: true},
       ex_aws()
@@ -65,7 +69,7 @@ defmodule ExAws.SQS.Mixfile do
   defp ex_aws() do
     case System.get_env("AWS") do
       "LOCAL" -> {:ex_aws, path: "../ex_aws"}
-      _ -> {:ex_aws, "~> 2.0"}
+      _ -> {:ex_aws, "~> 2.1"}
     end
   end
 end

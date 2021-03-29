@@ -8,7 +8,8 @@ defmodule ExAws.SQSIntegrationTest do
   setup_all do
     ExAws.Config.new(:sqs)
 
-    {:ok, %{body: %{queue_url: queue_url}}} = SQS.create_queue(@queue_name, [], %{tag1: "value"}) |> ExAws.request()
+    {:ok, %{body: %{queue_url: queue_url}}} =
+      SQS.create_queue(@queue_name, [], %{tag1: "value"}) |> ExAws.request()
 
     [queue_url: queue_url]
   end
@@ -121,20 +122,43 @@ defmodule ExAws.SQSIntegrationTest do
   end
 
   test "delete_message/2", context do
+    {:ok, _} = SQS.send_message(context.queue_url, "test message") |> ExAws.request()
+
+    {:ok, %{body: %{messages: messages}}} =
+      SQS.receive_message(context.queue_url) |> ExAws.request()
+
+    assert is_list(messages)
+    assert Enum.count(messages) > 0
+    [msg | _] = messages
+
     assert {:ok, %{body: %{request_id: _}}} =
-             SQS.delete_message(context.queue_url, "a_receipt_handle") |> ExAws.request()
+             SQS.delete_message(context.queue_url, msg.receipt_handle) |> ExAws.request()
   end
 
   test "delete_message_batch/2", context do
+    {:ok, _} = SQS.send_message(context.queue_url, "test message") |> ExAws.request()
+    {:ok, _} = SQS.send_message(context.queue_url, "test message 2") |> ExAws.request()
+
+    {:ok, %{body: %{messages: messages}}} =
+      SQS.receive_message(context.queue_url,
+        attribute_names: :all,
+        max_number_of_messages: 2
+      )
+      |> ExAws.request()
+
+    assert is_list(messages)
+    assert Enum.count(messages) > 1
+    [msg1, msg2 | _] = messages
+
     assert {:ok, _} =
              SQS.delete_message_batch(context.queue_url, [
                %{
                  id: "message_1",
-                 receipt_handle: "a_receipt_handle"
+                 receipt_handle: msg1.receipt_handle
                },
                %{
                  id: "message_2",
-                 receipt_handle: "another_receipt_handle"
+                 receipt_handle: msg2.receipt_handle
                }
              ])
              |> ExAws.request()
@@ -174,7 +198,7 @@ defmodule ExAws.SQSIntegrationTest do
     assert queue_url |> String.contains?(@queue_name)
   end
 
-  # This is skipped because elasticmq does not support this action which is used for testing, this 
+  # This is skipped because elasticmq does not support this action which is used for testing, this
   # Does work against AWS SQS directly
   @tag :skip
   test "list_dead_letter_source_queues/1", context do
@@ -194,7 +218,9 @@ defmodule ExAws.SQSIntegrationTest do
   end
 
   test "list_queue_tags/1", context do
-    assert {:ok, %{body: %{tags: tags}}} = SQS.list_queue_tags(context.queue_url) |> ExAws.request()
+    assert {:ok, %{body: %{tags: tags}}} =
+             SQS.list_queue_tags(context.queue_url) |> ExAws.request()
+
     assert is_list(tags)
   end
 
@@ -221,7 +247,7 @@ defmodule ExAws.SQSIntegrationTest do
     assert is_list(messages)
   end
 
-  # This is skipped because elasticmq does not support this action which is used for testing, this 
+  # This is skipped because elasticmq does not support this action which is used for testing, this
   # Does work against AWS SQS directly
   @tag :skip
   test "remove_permission/2", context do
