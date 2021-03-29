@@ -16,8 +16,8 @@ along with `:ex_aws` and your preferred JSON codec / HTTP client:
 ```elixir
 def deps do
   [
-    {:ex_aws, "~> 2.0"},
-    {:ex_aws_sqs, "~> 3.2"},
+    {:ex_aws, "~> 2.1"},
+    {:ex_aws_sqs, "~> 3.3"},
     {:poison, "~> 3.0"},
     {:hackney, "~> 1.9"},
     {:saxy, "~> 1.1"}, # or {:sweet_xml, "~> 0.6"}
