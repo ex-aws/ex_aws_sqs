@@ -74,7 +74,7 @@ if Code.ensure_loaded?(SweetXml) do
           attributes: [
             ~x"./GetQueueAttributesResult/Attribute"l,
             name: ~x"./Name/text()"s,
-            value: ~x"./Value/text()"s |> SweetXml.transform_by(&try_cast/1)
+            value: ~x"./Value/text()"s
           ],
           request_id: request_id_xpath()
         )
@@ -133,7 +133,7 @@ if Code.ensure_loaded?(SweetXml) do
             attributes: [
               ~x"./Attribute"lo,
               name: ~x"./Name/text()"s,
-              value: ~x"./Value/text()"s |> SweetXml.transform_by(&try_cast/1)
+              value: ~x"./Value/text()"s
             ],
             message_attributes: [
               ~x"./MessageAttribute"lo,
@@ -299,19 +299,27 @@ if Code.ensure_loaded?(SweetXml) do
             attribute_name
           end
 
-        Map.put(acc, attribute_name, val)
+        parsed_val = try_cast(attribute_name, val)
+
+        Map.put(acc, attribute_name, parsed_val)
       end)
     end
 
-    defp try_cast("true"), do: true
-    defp try_cast("false"), do: false
+    def try_cast(_name, "true"), do: true
+    def try_cast(_name, "false"), do: false
 
-    defp try_cast(string_val) do
-      try do
-        String.to_integer(string_val)
-      rescue
-        ArgumentError ->
+    def try_cast(name, string_val) do
+      case name do
+        "message_group_id" ->
           string_val
+
+        _ ->
+          try do
+            String.to_integer(string_val)
+          rescue
+            ArgumentError ->
+              string_val
+          end
       end
     end
 

@@ -90,7 +90,7 @@ if Code.ensure_loaded?(Saxy) do
                               "Attribute",
                               :many,
                               name: ["Name"],
-                              value: ["Value", &__MODULE__.try_cast/1]
+                              value: ["Value"]
                             ]
                           )
 
@@ -159,7 +159,7 @@ if Code.ensure_loaded?(Saxy) do
                            "Attribute",
                            :many,
                            name: ["Name"],
-                           value: ["Value", &__MODULE__.try_cast/1]
+                           value: ["Value"]
                          ],
                          message_attributes: [
                            "MessageAttribute",
@@ -337,19 +337,27 @@ if Code.ensure_loaded?(Saxy) do
             attribute_name
           end
 
-        Map.put(acc, attribute_name, val)
+        parsed_val = try_cast(attribute_name, val)
+
+        Map.put(acc, attribute_name, parsed_val)
       end)
     end
 
-    def try_cast("true"), do: true
-    def try_cast("false"), do: false
+    def try_cast(_name, "true"), do: true
+    def try_cast(_name, "false"), do: false
 
-    def try_cast(string_val) do
-      try do
-        String.to_integer(string_val)
-      rescue
-        ArgumentError ->
+    def try_cast(name, string_val) do
+      case name do
+        "message_group_id" ->
           string_val
+
+        _ ->
+          try do
+            String.to_integer(string_val)
+          rescue
+            ArgumentError ->
+              string_val
+          end
       end
     end
   end
