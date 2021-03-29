@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.3.1 - 2021-03-29
+
+- [Fix Issue #24](https://github.com/ex-aws/ex_aws_sqs/issues/24) Always parse MessageGroupId as a string
+
 ## v3.3.0 - 2021-03-28
 
 - Updated min elixir version to 1.7
