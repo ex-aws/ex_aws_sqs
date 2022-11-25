@@ -258,8 +258,10 @@ if Code.ensure_loaded?(Saxy) do
                     )
 
     def parse({:error, {type, http_status_code, %{body: xml}}}, _) do
-      parsed_body = Saxy.parse_string!(xml, @error_response)
-      {:error, {type, http_status_code, parsed_body}}
+      case Saxy.parse_string(xml, @error_response) do
+        {:ok, parsed_body} -> {:error, {type, http_status_code, parsed_body}}
+        {:error, _} -> {:error, {type, http_status_code, xml}}
+      end
     end
 
     def parse(val, _), do: val

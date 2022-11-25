@@ -94,6 +94,10 @@ if Code.ensure_loaded?(Saxy) do
       end
     end
 
+    def parse_string(data, definition) when is_binary(data) do
+      Saxy.parse_string(data, __MODULE__, definition, [])
+    end
+
     @doc false
     def identity(value), do: value
 
