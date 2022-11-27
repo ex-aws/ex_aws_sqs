@@ -42,7 +42,7 @@ defmodule ExAws.SQS do
           | :redrive_policy
           | :fifo_queue
           | :content_based_deduplication
-  @type visibility_timeout :: 0..43200
+  @type visibility_timeout :: 0..43_200
   @type queue_attributes :: [
           {:policy, binary}
           | {:visibility_timeout, visibility_timeout}
@@ -60,7 +60,7 @@ defmodule ExAws.SQS do
           | {:fifo_queue, boolean}
           | {:content_based_deduplication, boolean}
           | {:kms_master_key_id, binary}
-          | {:kms_data_key_reuse_period_seconds, 60..86400}
+          | {:kms_data_key_reuse_period_seconds, 60..86_400}
         ]
   @type sqs_message_attribute :: %{
           :name => binary,
@@ -307,7 +307,7 @@ defmodule ExAws.SQS do
           {:attribute_names, :all | [sqs_message_attribute_name, ...]}
           | {:message_attribute_names, :all | [String.Chars.t(), ...]}
           | {:max_number_of_messages, 1..10}
-          | {:visibility_timeout, 0..43200}
+          | {:visibility_timeout, 0..43_200}
           | {:wait_time_seconds, 0..20}
           | {:receive_request_attempt_id, String.t()}
         ]

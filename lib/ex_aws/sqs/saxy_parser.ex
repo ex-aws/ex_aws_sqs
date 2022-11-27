@@ -220,7 +220,7 @@ if Code.ensure_loaded?(Saxy) do
                             code: ["Code"],
                             id: ["Id"],
                             message: ["Message"],
-                            # FIXME Cast to boolean
+                            # TODO Cast to boolean
                             sender_fault: ["SenderFault"]
                           ]
                         )

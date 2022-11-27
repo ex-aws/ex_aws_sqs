@@ -1,5 +1,7 @@
 if Code.ensure_loaded?(SweetXml) do
   defmodule ExAws.SQS.SweetXmlParser do
+    @moduledoc false
+
     # TODO: Uncomment in the future
     # unless Code.ensure_loaded?(Saxy) do
     #   IO.puts :stderr, """
@@ -32,8 +34,8 @@ if Code.ensure_loaded?(SweetXml) do
       {:ok, Map.put(resp, :body, parsed_body)}
     end
 
-    def parse(rsp = {:ok, _}, :change_message_visibility) do
-      parse_request_id(rsp, ~x"//ChangeMessageVisibilityResponse")
+    def parse({:ok, _} = resp, :change_message_visibility) do
+      parse_request_id(resp, ~x"//ChangeMessageVisibilityResponse")
     end
 
     def parse({:ok, %{body: xml} = resp}, :change_message_visibility_batch) do
@@ -48,12 +50,12 @@ if Code.ensure_loaded?(SweetXml) do
       {:ok, Map.put(resp, :body, parsed_body)}
     end
 
-    def parse(rsp = {:ok, _}, :delete_message) do
-      parse_request_id(rsp, ~x"//DeleteMessageResponse")
+    def parse({:ok, _} = resp, :delete_message) do
+      parse_request_id(resp, ~x"//DeleteMessageResponse")
     end
 
-    def parse(rsp = {:ok, _}, :delete_queue) do
-      parse_request_id(rsp, ~x"//DeleteQueueResponse")
+    def parse({:ok, _} = resp, :delete_queue) do
+      parse_request_id(resp, ~x"//DeleteQueueResponse")
     end
 
     def parse({:ok, %{body: xml} = resp}, :delete_message_batch) do
@@ -105,7 +107,7 @@ if Code.ensure_loaded?(SweetXml) do
       {:ok, Map.put(resp, :body, parsed_body)}
     end
 
-    def parse(msg = {:ok, _resp}, :purge_queue) do
+    def parse({:ok, _resp} = msg, :purge_queue) do
       parse_request_id(msg, ~x"//PurgeQueueResponse")
     end
 
@@ -191,7 +193,7 @@ if Code.ensure_loaded?(SweetXml) do
             code: ~x"./Code/text()"s,
             id: ~x"./Id/text()"s,
             message: ~x"./Message/text()"s,
-            # FIXME Cast to boolean
+            # TODO Cast to boolean
             sender_fault: ~x"./SenderFault/text()"s
           ]
         )
