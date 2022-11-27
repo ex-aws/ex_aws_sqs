@@ -10,7 +10,7 @@ defmodule ExAws.SQS.Mixfile do
       app: :ex_aws_sqs,
       name: "ExAws.SQS",
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
