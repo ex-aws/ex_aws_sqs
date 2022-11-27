@@ -17,7 +17,7 @@ defmodule ExAws.SQS.Mixfile do
       docs: docs(),
       package: package(),
       dialyzer: [
-        plt_add_apps: [:ex_unit, :sweet_xml]
+        plt_add_apps: [:ex_unit, :sweet_xml, :saxy]
       ]
     ]
   end
