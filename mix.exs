@@ -15,7 +15,10 @@ defmodule ExAws.SQS.Mixfile do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: docs(),
-      package: package()
+      package: package(),
+      dialyzer: [
+        plt_add_apps: [:ex_unit, :sweet_xml]
+      ]
     ]
   end
 
@@ -48,6 +51,7 @@ defmodule ExAws.SQS.Mixfile do
   defp deps do
     [
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:hackney, "~> 1.9", optional: true},
       {:jason, "~> 1.1", optional: true},
