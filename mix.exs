@@ -62,7 +62,7 @@ defmodule ExAws.SQS.Mixfile do
       extras: ["CHANGELOG.md", "README.md"],
       main: "readme",
       source_url: @url_github,
-      source_ref: "#v{@version}",
+      source_ref: "v#{@version}",
       formatters: ["html"]
     ]
   end
