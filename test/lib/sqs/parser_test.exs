@@ -5,6 +5,10 @@ defmodule ExAws.SQS.ParserTest do
     {:ok, %{body: doc}}
   end
 
+  defp to_error(doc, error_type, status_code) do
+    {:error, {error_type, status_code, %{body: doc}}}
+  end
+
   for parser <- [ExAws.SQS.SweetXmlParser, ExAws.SQS.SaxyParser] do
     describe "#{inspect(parser)}" do
       @parser parser
@@ -693,6 +697,13 @@ defmodule ExAws.SQS.ParserTest do
                  %{key: "Key1", value: "Value1"},
                  %{key: "Key2", value: "Value2"}
                ]
+      end
+
+      test "handle non-xml error response" do
+        rsp = "HTTP content length exceeded 1662976 bytes."
+          |> to_error(:http_error, 413)
+
+        assert {:error, {:http_error, 413, "HTTP content length exceeded 1662976 bytes."}} = @parser.parse(rsp, :send_message_batch)
       end
     end
   end

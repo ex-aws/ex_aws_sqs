@@ -1,7 +1,7 @@
 defmodule ExAws.SQS.Mixfile do
   use Mix.Project
 
-  @version "3.3.1"
+  @version "3.3.2"
   @url_docs "https://hexdocs.pm/ex_aws_sqs"
   @url_github "https://github.com/ex-aws/ex_aws_sqs"
 
