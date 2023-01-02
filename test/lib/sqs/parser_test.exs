@@ -700,10 +700,12 @@ defmodule ExAws.SQS.ParserTest do
       end
 
       test "handle non-xml error response" do
-        rsp = "HTTP content length exceeded 1662976 bytes."
+        rsp =
+          "HTTP content length exceeded 1662976 bytes."
           |> to_error(:http_error, 413)
 
-        assert {:error, {:http_error, 413, "HTTP content length exceeded 1662976 bytes."}} = @parser.parse(rsp, :send_message_batch)
+        assert {:error, {:http_error, 413, "HTTP content length exceeded 1662976 bytes."}} =
+                 @parser.parse(rsp, :send_message_batch)
       end
     end
   end
