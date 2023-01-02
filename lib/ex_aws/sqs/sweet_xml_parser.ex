@@ -10,7 +10,26 @@ if Code.ensure_loaded?(SweetXml) do
     #   """
     # end
 
-    use ExAws.Operation.Query.Parser
+    import SweetXml, only: [sigil_x: 2]
+
+    def parse({:error, {type, http_status_code, %{body: xml}}}, _) do
+      if String.starts_with?(xml, "<") do
+        parsed_body =
+          xml
+          |> SweetXml.xpath(
+            ~x"//ErrorResponse",
+            request_id: ~x"./RequestId/text()"s,
+            type: ~x"./Error/Type/text()"s,
+            code: ~x"./Error/Code/text()"s,
+            message: ~x"./Error/Message/text()"s,
+            detail: ~x"./Error/Detail/text()"s
+          )
+
+        {:error, {type, http_status_code, parsed_body}}
+      else
+        {:error, {type, http_status_code, xml}}
+      end
+    end
 
     def parse({:ok, %{body: xml} = resp}, :list_queues) do
       parsed_body =
