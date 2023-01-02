@@ -699,6 +699,30 @@ defmodule ExAws.SQS.ParserTest do
                ]
       end
 
+      test "handle error response" do
+        rsp =
+          """
+          <ErrorResponse>
+            <Error>
+              <Type>Sender</Type>
+              <Code>InvalidParameterValue</Code>
+              <Message>Value (quename_nonalpha) for parameter QueueName is invalid.\nMust be an alphanumeric String of 1 to 80 in length.</Message>
+            </Error>
+            <RequestId>42d59b56-7407-4c4a-be0f-4c88daeea257</RequestId>
+          </ErrorResponse>
+          """
+          |> to_error(:http_error, 400)
+
+        {:error, {:http_error, 400, response}} = @parser.parse(rsp, :create_queue)
+
+        assert "42d59b56-7407-4c4a-be0f-4c88daeea257" == response[:request_id]
+        assert "Sender" == response[:type]
+        assert "InvalidParameterValue" == response[:code]
+
+        assert "Value (quename_nonalpha) for parameter QueueName is invalid.\nMust be an alphanumeric String of 1 to 80 in length." ==
+                 response[:message]
+      end
+
       test "handle non-xml error response" do
         rsp =
           "HTTP content length exceeded 1662976 bytes."
