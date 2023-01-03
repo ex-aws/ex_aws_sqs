@@ -5,6 +5,10 @@ defmodule ExAws.SQS.ParserTest do
     {:ok, %{body: doc}}
   end
 
+  defp to_error(doc, error_type, status_code) do
+    {:error, {error_type, status_code, %{body: doc}}}
+  end
+
   for parser <- [ExAws.SQS.SweetXmlParser, ExAws.SQS.SaxyParser] do
     describe "#{inspect(parser)}" do
       @parser parser
@@ -693,6 +697,39 @@ defmodule ExAws.SQS.ParserTest do
                  %{key: "Key1", value: "Value1"},
                  %{key: "Key2", value: "Value2"}
                ]
+      end
+
+      test "handle error response" do
+        rsp =
+          """
+          <ErrorResponse>
+            <Error>
+              <Type>Sender</Type>
+              <Code>InvalidParameterValue</Code>
+              <Message>Value (quename_nonalpha) for parameter QueueName is invalid.\nMust be an alphanumeric String of 1 to 80 in length.</Message>
+            </Error>
+            <RequestId>42d59b56-7407-4c4a-be0f-4c88daeea257</RequestId>
+          </ErrorResponse>
+          """
+          |> to_error(:http_error, 400)
+
+        {:error, {:http_error, 400, response}} = @parser.parse(rsp, :create_queue)
+
+        assert "42d59b56-7407-4c4a-be0f-4c88daeea257" == response[:request_id]
+        assert "Sender" == response[:type]
+        assert "InvalidParameterValue" == response[:code]
+
+        assert "Value (quename_nonalpha) for parameter QueueName is invalid.\nMust be an alphanumeric String of 1 to 80 in length." ==
+                 response[:message]
+      end
+
+      test "handle non-xml error response" do
+        rsp =
+          "HTTP content length exceeded 1662976 bytes."
+          |> to_error(:http_error, 413)
+
+        assert {:error, {:http_error, 413, "HTTP content length exceeded 1662976 bytes."}} =
+                 @parser.parse(rsp, :send_message_batch)
       end
     end
   end

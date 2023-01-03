@@ -18,10 +18,12 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
           version-type: strict
+      - name: Run elasticmq
+        run: docker run -d -p 9324:9324 softwaremill/elasticmq
       - run: mix deps.get
       - run: mix compile
       - run: mix format --check-formatted
         if: matrix.elixir == '1.14.2' # Only check formatting with the latest verison
       - run: mix dialyzer
         if: matrix.elixir == '1.14.2'
-      - run: mix test
+      - run: mix test  --include external:true
