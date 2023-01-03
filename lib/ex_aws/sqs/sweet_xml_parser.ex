@@ -12,10 +12,10 @@ if Code.ensure_loaded?(SweetXml) do
 
     import SweetXml, only: [sigil_x: 2]
 
-    def parse({:error, {type, http_status_code, %{body: xml}}}, _) do
-      if String.starts_with?(xml, "<") do
+    def parse({:error, {type, http_status_code, %{body: body}}}, _) do
+      try do
         parsed_body =
-          xml
+          body
           |> SweetXml.xpath(
             ~x"//ErrorResponse",
             request_id: ~x"./RequestId/text()"s,
@@ -26,8 +26,8 @@ if Code.ensure_loaded?(SweetXml) do
           )
 
         {:error, {type, http_status_code, parsed_body}}
-      else
-        {:error, {type, http_status_code, xml}}
+      catch
+        :exit, _ -> {:error, {type, http_status_code, body}}
       end
     end
 
