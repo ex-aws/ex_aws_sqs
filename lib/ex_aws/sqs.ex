@@ -65,7 +65,7 @@ defmodule ExAws.SQS do
   @type sqs_message_attribute :: %{
           :name => binary,
           :data_type => :string | :binary | :number,
-          :custom_type => binary | none,
+          optional(:custom_type) => binary,
           :value => binary | number
         }
 
