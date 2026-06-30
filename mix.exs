@@ -50,10 +50,10 @@ defmodule ExAws.SQS.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:hackney, "~> 1.9", optional: true},
+      {:hackney, "~> 4.4", optional: true},
       {:jason, "~> 1.1", optional: true},
       {:saxy, "~> 1.1", optional: true},
       {:sweet_xml, ">= 0.0.0", optional: true},
@@ -74,7 +74,7 @@ defmodule ExAws.SQS.Mixfile do
   defp ex_aws() do
     case System.get_env("AWS") do
       "LOCAL" -> {:ex_aws, path: "../ex_aws"}
-      _ -> {:ex_aws, "~> 2.1"}
+      _ -> {:ex_aws, "~> 2.7"}
     end
   end
 end
