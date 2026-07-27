@@ -53,7 +53,7 @@ defmodule ExAws.SQS.Mixfile do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:hackney, "~> 4.4", optional: true},
+      {:hackney, ">= 0.0.0", only: [:dev, :test]},
       {:jason, "~> 1.1", optional: true},
       {:saxy, "~> 1.1", optional: true},
       {:sweet_xml, ">= 0.0.0", optional: true},
