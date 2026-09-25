@@ -3,8 +3,8 @@
 [![Module Version](https://img.shields.io/hexpm/v/ex_aws_sqs.svg)](https://hex.pm/packages/ex_aws_sqs)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ex_aws_sqs/)
 [![Total Download](https://img.shields.io/hexpm/dt/ex_aws_sqs.svg)](https://hex.pm/packages/ex_aws_sqs)
-[![License](https://img.shields.io/hexpm/l/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs/blob/master/LICENSE)
-[![Last Updated](https://img.shields.io/github/last-commit/ex-aws/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs/commits/master)
+[![License](https://img.shields.io/hexpm/l/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs#copyright-and-license)
+[![Last Updated](https://img.shields.io/github/last-commit/ex-aws/ex_aws_sqs.svg)](https://github.com/ex-aws/ex_aws_sqs/commits/main)
 
 Service module for [https://github.com/ex-aws/ex_aws](https://github.com/ex-aws/ex_aws).
 
@@ -17,10 +17,10 @@ along with `:ex_aws` and your preferred JSON codec / HTTP client:
 def deps do
   [
     {:ex_aws, "~> 2.1"},
-    {:ex_aws_sqs, "~> 3.3"},
-    {:poison, "~> 3.0"},
-    {:hackney, "~> 1.9"},
-    {:saxy, "~> 1.1"}, # or {:sweet_xml, "~> 0.6"}
+    {:ex_aws_sqs, "~> 3.5"},
+    {:jason, "~> 1.1"},
+    {:hackney, "~> 4.0"},
+    {:saxy, "~> 1.1"}, # or {:sweet_xml, "~> 0.7"}
   ]
 end
 ```

@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.5.0 - 2026-09-25
+
+- Updated min elixir version to 1.15
+- Removed optional `:hackney` dependency, allowing use with hackney 4.x ([#36](https://github.com/ex-aws/ex_aws_sqs/issues/36))
+- Fixed `sqs_message_attribute` typing so `:custom_type` is optional
+
+## v3.4.0 - 2023-01-04
+
+- Updated min elixir version to 1.10
+- Handle non-XML error response bodies
+- Catch SweetXml parsing errors when parsing error responses
+- Fixed docs source ref link
+
 ## v3.3.1 - 2021-03-29
 
 - [Fix Issue #24](https://github.com/ex-aws/ex_aws_sqs/issues/24) Always parse MessageGroupId as a string
