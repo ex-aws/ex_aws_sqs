@@ -2,11 +2,14 @@ name: on-push
 on: [push, pull_request]
 env:
   MIX_ENV: test
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 jobs:
   build:
     runs-on: ubuntu-24.04
+    services:
+      elasticmq:
+        image: softwaremill/elasticmq
+        ports:
+          - 9324:9324
     # See https://hexdocs.pm/elixir/compatibility-and-deprecations.html#compatibility-between-elixir-and-erlang-otp
     strategy:
       matrix:
@@ -63,12 +66,12 @@ jobs:
       - run: mix compile --warnings-as-errors
 
       - run: mix deps.unlock --check-unused
-        if: ${{matrix.lint}}
+        if: ${{ matrix.pair.lint }}
 
       - run: mix format --check-formatted
-        if: ${{matrix.lint}}
+        if: ${{ matrix.pair.lint }}
 
       - run: mix dialyzer
-        if: ${{matrix.lint}}
+        if: ${{ matrix.pair.lint }}
 
-      - run: mix test
+      - run: mix test --include external:true
